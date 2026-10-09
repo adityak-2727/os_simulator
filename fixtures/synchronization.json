@@ -1,0 +1,538 @@
+{
+  "format": "os-lab-fixture",
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "lost-update",
+      "input": {
+        "kind": "synchronization",
+        "initialCounter": 0,
+        "capacity": 2,
+        "mutexIds": [],
+        "semaphores": [],
+        "preset": "counter-race",
+        "processes": [
+          {
+            "id": "P1",
+            "instructions": [
+              {
+                "op": "read-counter",
+                "register": "r"
+              },
+              {
+                "op": "add-local",
+                "register": "r",
+                "value": 1
+              },
+              {
+                "op": "write-counter",
+                "register": "r"
+              }
+            ]
+          },
+          {
+            "id": "P2",
+            "instructions": [
+              {
+                "op": "read-counter",
+                "register": "r"
+              },
+              {
+                "op": "add-local",
+                "register": "r",
+                "value": 1
+              },
+              {
+                "op": "write-counter",
+                "register": "r"
+              }
+            ]
+          }
+        ],
+        "schedule": [
+          "P1",
+          "P2",
+          "P1",
+          "P2",
+          "P1",
+          "P2"
+        ]
+      },
+      "expected": {
+        "counter": 1,
+        "trace": [
+          {
+            "selected": "P1",
+            "instruction": "read-counter",
+            "counter": 0,
+            "programCounters": {
+              "P1": 1,
+              "P2": 0
+            },
+            "localR": {
+              "P1": 0
+            },
+            "mutexOwner": null,
+            "waitQueue": []
+          },
+          {
+            "selected": "P2",
+            "instruction": "read-counter",
+            "counter": 0,
+            "programCounters": {
+              "P1": 1,
+              "P2": 1
+            },
+            "localR": {
+              "P1": 0,
+              "P2": 0
+            },
+            "mutexOwner": null,
+            "waitQueue": []
+          },
+          {
+            "selected": "P1",
+            "instruction": "add-local",
+            "counter": 0,
+            "programCounters": {
+              "P1": 2,
+              "P2": 1
+            },
+            "localR": {
+              "P1": 1,
+              "P2": 0
+            },
+            "mutexOwner": null,
+            "waitQueue": []
+          },
+          {
+            "selected": "P2",
+            "instruction": "add-local",
+            "counter": 0,
+            "programCounters": {
+              "P1": 2,
+              "P2": 2
+            },
+            "localR": {
+              "P1": 1,
+              "P2": 1
+            },
+            "mutexOwner": null,
+            "waitQueue": []
+          },
+          {
+            "selected": "P1",
+            "instruction": "write-counter",
+            "counter": 1,
+            "programCounters": {
+              "P1": 3,
+              "P2": 2
+            },
+            "localR": {
+              "P1": 1,
+              "P2": 1
+            },
+            "mutexOwner": null,
+            "waitQueue": []
+          },
+          {
+            "selected": "P2",
+            "instruction": "write-counter",
+            "counter": 1,
+            "programCounters": {
+              "P1": 3,
+              "P2": 3
+            },
+            "localR": {
+              "P1": 1,
+              "P2": 1
+            },
+            "mutexOwner": null,
+            "waitQueue": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "mutex-protected",
+      "input": {
+        "kind": "synchronization",
+        "initialCounter": 0,
+        "capacity": 2,
+        "mutexIds": [
+          "m"
+        ],
+        "semaphores": [],
+        "preset": "counter-mutex",
+        "processes": [
+          {
+            "id": "P1",
+            "instructions": [
+              {
+                "op": "lock",
+                "mutex": "m"
+              },
+              {
+                "op": "read-counter",
+                "register": "r"
+              },
+              {
+                "op": "add-local",
+                "register": "r",
+                "value": 1
+              },
+              {
+                "op": "write-counter",
+                "register": "r"
+              },
+              {
+                "op": "unlock",
+                "mutex": "m"
+              }
+            ]
+          },
+          {
+            "id": "P2",
+            "instructions": [
+              {
+                "op": "lock",
+                "mutex": "m"
+              },
+              {
+                "op": "read-counter",
+                "register": "r"
+              },
+              {
+                "op": "add-local",
+                "register": "r",
+                "value": 1
+              },
+              {
+                "op": "write-counter",
+                "register": "r"
+              },
+              {
+                "op": "unlock",
+                "mutex": "m"
+              }
+            ]
+          }
+        ],
+        "schedule": [
+          "P1",
+          "P2",
+          "P1",
+          "P1",
+          "P1",
+          "P1",
+          "P2",
+          "P2",
+          "P2",
+          "P2"
+        ]
+      },
+      "expected": {
+        "counter": 2,
+        "trace": [
+          {
+            "selected": "P1",
+            "instruction": "lock",
+            "counter": 0,
+            "programCounters": {
+              "P1": 1,
+              "P2": 0
+            },
+            "localR": {},
+            "mutexOwner": "P1",
+            "waitQueue": []
+          },
+          {
+            "selected": "P2",
+            "instruction": "lock",
+            "counter": 0,
+            "programCounters": {
+              "P1": 1,
+              "P2": 0
+            },
+            "localR": {},
+            "mutexOwner": "P1",
+            "waitQueue": [
+              "P2"
+            ]
+          },
+          {
+            "selected": "P1",
+            "instruction": "read-counter",
+            "counter": 0,
+            "programCounters": {
+              "P1": 2,
+              "P2": 0
+            },
+            "localR": {
+              "P1": 0
+            },
+            "mutexOwner": "P1",
+            "waitQueue": [
+              "P2"
+            ]
+          },
+          {
+            "selected": "P1",
+            "instruction": "add-local",
+            "counter": 0,
+            "programCounters": {
+              "P1": 3,
+              "P2": 0
+            },
+            "localR": {
+              "P1": 1
+            },
+            "mutexOwner": "P1",
+            "waitQueue": [
+              "P2"
+            ]
+          },
+          {
+            "selected": "P1",
+            "instruction": "write-counter",
+            "counter": 1,
+            "programCounters": {
+              "P1": 4,
+              "P2": 0
+            },
+            "localR": {
+              "P1": 1
+            },
+            "mutexOwner": "P1",
+            "waitQueue": [
+              "P2"
+            ]
+          },
+          {
+            "selected": "P1",
+            "instruction": "unlock",
+            "counter": 1,
+            "programCounters": {
+              "P1": 5,
+              "P2": 1
+            },
+            "localR": {
+              "P1": 1
+            },
+            "mutexOwner": "P2",
+            "waitQueue": []
+          },
+          {
+            "selected": "P2",
+            "instruction": "read-counter",
+            "counter": 1,
+            "programCounters": {
+              "P1": 5,
+              "P2": 2
+            },
+            "localR": {
+              "P1": 1,
+              "P2": 1
+            },
+            "mutexOwner": "P2",
+            "waitQueue": []
+          },
+          {
+            "selected": "P2",
+            "instruction": "add-local",
+            "counter": 1,
+            "programCounters": {
+              "P1": 5,
+              "P2": 3
+            },
+            "localR": {
+              "P1": 1,
+              "P2": 2
+            },
+            "mutexOwner": "P2",
+            "waitQueue": []
+          },
+          {
+            "selected": "P2",
+            "instruction": "write-counter",
+            "counter": 2,
+            "programCounters": {
+              "P1": 5,
+              "P2": 4
+            },
+            "localR": {
+              "P1": 1,
+              "P2": 2
+            },
+            "mutexOwner": "P2",
+            "waitQueue": []
+          },
+          {
+            "selected": "P2",
+            "instruction": "unlock",
+            "counter": 2,
+            "programCounters": {
+              "P1": 5,
+              "P2": 5
+            },
+            "localR": {
+              "P1": 1,
+              "P2": 2
+            },
+            "mutexOwner": null,
+            "waitQueue": []
+          }
+        ]
+      }
+    },
+    {
+      "name": "bounded-buffer",
+      "input": {
+        "kind": "synchronization",
+        "preset": "producer-consumer",
+        "initialCounter": 0,
+        "capacity": 2,
+        "mutexIds": [
+          "m"
+        ],
+        "semaphores": [
+          {
+            "id": "empty",
+            "initial": 2
+          },
+          {
+            "id": "full",
+            "initial": 0
+          }
+        ],
+        "processes": [
+          {
+            "id": "Producer",
+            "instructions": [
+              {
+                "op": "wait",
+                "semaphore": "empty"
+              },
+              {
+                "op": "lock",
+                "mutex": "m"
+              },
+              {
+                "op": "enqueue",
+                "value": "A"
+              },
+              {
+                "op": "unlock",
+                "mutex": "m"
+              },
+              {
+                "op": "signal",
+                "semaphore": "full"
+              },
+              {
+                "op": "wait",
+                "semaphore": "empty"
+              },
+              {
+                "op": "lock",
+                "mutex": "m"
+              },
+              {
+                "op": "enqueue",
+                "value": "B"
+              },
+              {
+                "op": "unlock",
+                "mutex": "m"
+              },
+              {
+                "op": "signal",
+                "semaphore": "full"
+              }
+            ]
+          },
+          {
+            "id": "Consumer",
+            "instructions": [
+              {
+                "op": "wait",
+                "semaphore": "full"
+              },
+              {
+                "op": "lock",
+                "mutex": "m"
+              },
+              {
+                "op": "dequeue",
+                "register": "item"
+              },
+              {
+                "op": "unlock",
+                "mutex": "m"
+              },
+              {
+                "op": "signal",
+                "semaphore": "empty"
+              },
+              {
+                "op": "wait",
+                "semaphore": "full"
+              },
+              {
+                "op": "lock",
+                "mutex": "m"
+              },
+              {
+                "op": "dequeue",
+                "register": "item"
+              },
+              {
+                "op": "unlock",
+                "mutex": "m"
+              },
+              {
+                "op": "signal",
+                "semaphore": "empty"
+              }
+            ]
+          }
+        ],
+        "schedule": [
+          "Producer",
+          "Producer",
+          "Producer",
+          "Producer",
+          "Producer",
+          "Producer",
+          "Producer",
+          "Producer",
+          "Producer",
+          "Producer",
+          "Consumer",
+          "Consumer",
+          "Consumer",
+          "Consumer",
+          "Consumer",
+          "Consumer",
+          "Consumer",
+          "Consumer",
+          "Consumer",
+          "Consumer"
+        ]
+      },
+      "expected": {
+        "consumed": [
+          "A",
+          "B"
+        ],
+        "finalBuffer": [],
+        "maxBufferOccupancy": 2,
+        "finalSemaphores": {
+          "empty": 2,
+          "full": 0
+        },
+        "finalMutexOwner": null
+      }
+    }
+  ]
+}

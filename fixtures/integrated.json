@@ -1,0 +1,169 @@
+{
+  "format": "os-lab-fixture",
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "cpu-memory-resource-reference",
+      "input": {
+        "kind": "system",
+        "totalKiB": 96,
+        "algorithm": "rr",
+        "quantum": 2,
+        "resources": [
+          {
+            "id": "R1",
+            "instances": 1
+          }
+        ],
+        "processes": [
+          {
+            "id": "P1",
+            "arrival": 0,
+            "memoryKiB": 64,
+            "program": [
+              {
+                "op": "acquire",
+                "resourceId": "R1"
+              },
+              {
+                "op": "cpu",
+                "duration": 4
+              },
+              {
+                "op": "release",
+                "resourceId": "R1"
+              },
+              {
+                "op": "cpu",
+                "duration": 1
+              }
+            ]
+          },
+          {
+            "id": "P2",
+            "arrival": 1,
+            "memoryKiB": 32,
+            "program": [
+              {
+                "op": "acquire",
+                "resourceId": "R1"
+              },
+              {
+                "op": "cpu",
+                "duration": 2
+              },
+              {
+                "op": "release",
+                "resourceId": "R1"
+              }
+            ]
+          },
+          {
+            "id": "P3",
+            "arrival": 2,
+            "memoryKiB": 32,
+            "program": [
+              {
+                "op": "cpu",
+                "duration": 1
+              }
+            ]
+          }
+        ]
+      },
+      "expected": {
+        "dispatchIntervals": [
+          {
+            "id": "P1",
+            "start": 0,
+            "end": 2
+          },
+          {
+            "id": "P1",
+            "start": 2,
+            "end": 4
+          },
+          {
+            "id": "P2",
+            "start": 4,
+            "end": 6
+          },
+          {
+            "id": "P1",
+            "start": 6,
+            "end": 7
+          },
+          {
+            "id": "P3",
+            "start": 7,
+            "end": 8
+          }
+        ],
+        "metrics": [
+          {
+            "id": "P1",
+            "completion": 7,
+            "turnaround": 7,
+            "cpuService": 5,
+            "readyWait": 2,
+            "resourceWait": 0,
+            "memoryWait": 0,
+            "response": 0
+          },
+          {
+            "id": "P2",
+            "completion": 6,
+            "turnaround": 5,
+            "cpuService": 2,
+            "readyWait": 1,
+            "resourceWait": 2,
+            "memoryWait": 0,
+            "response": 3
+          },
+          {
+            "id": "P3",
+            "completion": 8,
+            "turnaround": 6,
+            "cpuService": 1,
+            "readyWait": 1,
+            "resourceWait": 0,
+            "memoryWait": 4,
+            "response": 5
+          }
+        ],
+        "resourceBlockedIntervals": [
+          {
+            "id": "P2",
+            "resourceId": "R1",
+            "start": 2,
+            "end": 4
+          }
+        ],
+        "memoryWaitIntervals": [
+          {
+            "id": "P3",
+            "start": 2,
+            "end": 6
+          }
+        ],
+        "resourceOwnership": [
+          {
+            "resourceId": "R1",
+            "owner": "P1",
+            "start": 0,
+            "end": 4
+          },
+          {
+            "resourceId": "R1",
+            "owner": "P2",
+            "start": 4,
+            "end": 6
+          }
+        ],
+        "busyTime": 8,
+        "finishTime": 8,
+        "utilizationPercent": 100
+      }
+    }
+  ]
+}

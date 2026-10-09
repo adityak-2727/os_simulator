@@ -1,0 +1,411 @@
+{
+  "format": "os-lab-fixture",
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "fcfs-reference",
+      "input": {
+        "kind": "cpu",
+        "processes": [
+          {
+            "id": "P1",
+            "arrival": 0,
+            "burst": 5,
+            "priority": 2
+          },
+          {
+            "id": "P2",
+            "arrival": 1,
+            "burst": 3,
+            "priority": 1
+          },
+          {
+            "id": "P3",
+            "arrival": 2,
+            "burst": 1,
+            "priority": 3
+          }
+        ],
+        "algorithm": "fcfs",
+        "quantum": 2,
+        "contextSwitchCost": 0
+      },
+      "expected": {
+        "intervals": [
+          {
+            "id": "P1",
+            "start": 0,
+            "end": 5
+          },
+          {
+            "id": "P2",
+            "start": 5,
+            "end": 8
+          },
+          {
+            "id": "P3",
+            "start": 8,
+            "end": 9
+          }
+        ],
+        "metrics": [
+          {
+            "id": "P1",
+            "completion": 5,
+            "turnaround": 5,
+            "waiting": 0,
+            "response": 0
+          },
+          {
+            "id": "P2",
+            "completion": 8,
+            "turnaround": 7,
+            "waiting": 4,
+            "response": 4
+          },
+          {
+            "id": "P3",
+            "completion": 9,
+            "turnaround": 7,
+            "waiting": 6,
+            "response": 6
+          }
+        ],
+        "busyTime": 9,
+        "finishTime": 9,
+        "utilizationPercent": 100,
+        "averageWaiting": 3.3333333333333335,
+        "averageTurnaround": 6.333333333333333,
+        "averageResponse": 3.3333333333333335
+      }
+    },
+    {
+      "name": "sjf-reference",
+      "input": {
+        "kind": "cpu",
+        "processes": [
+          {
+            "id": "P1",
+            "arrival": 0,
+            "burst": 5,
+            "priority": 2
+          },
+          {
+            "id": "P2",
+            "arrival": 1,
+            "burst": 3,
+            "priority": 1
+          },
+          {
+            "id": "P3",
+            "arrival": 2,
+            "burst": 1,
+            "priority": 3
+          }
+        ],
+        "algorithm": "sjf",
+        "quantum": 2,
+        "contextSwitchCost": 0
+      },
+      "expected": {
+        "intervals": [
+          {
+            "id": "P1",
+            "start": 0,
+            "end": 5
+          },
+          {
+            "id": "P3",
+            "start": 5,
+            "end": 6
+          },
+          {
+            "id": "P2",
+            "start": 6,
+            "end": 9
+          }
+        ],
+        "metrics": [
+          {
+            "id": "P1",
+            "completion": 5,
+            "turnaround": 5,
+            "waiting": 0,
+            "response": 0
+          },
+          {
+            "id": "P2",
+            "completion": 9,
+            "turnaround": 8,
+            "waiting": 5,
+            "response": 5
+          },
+          {
+            "id": "P3",
+            "completion": 6,
+            "turnaround": 4,
+            "waiting": 3,
+            "response": 3
+          }
+        ],
+        "busyTime": 9,
+        "finishTime": 9,
+        "utilizationPercent": 100,
+        "averageWaiting": 2.6666666666666665,
+        "averageTurnaround": 5.666666666666667,
+        "averageResponse": 2.6666666666666665
+      }
+    },
+    {
+      "name": "priority-reference",
+      "input": {
+        "kind": "cpu",
+        "processes": [
+          {
+            "id": "P1",
+            "arrival": 0,
+            "burst": 5,
+            "priority": 2
+          },
+          {
+            "id": "P2",
+            "arrival": 1,
+            "burst": 3,
+            "priority": 1
+          },
+          {
+            "id": "P3",
+            "arrival": 2,
+            "burst": 1,
+            "priority": 3
+          }
+        ],
+        "algorithm": "priority",
+        "quantum": 2,
+        "contextSwitchCost": 0
+      },
+      "expected": {
+        "intervals": [
+          {
+            "id": "P1",
+            "start": 0,
+            "end": 5
+          },
+          {
+            "id": "P2",
+            "start": 5,
+            "end": 8
+          },
+          {
+            "id": "P3",
+            "start": 8,
+            "end": 9
+          }
+        ],
+        "metrics": [
+          {
+            "id": "P1",
+            "completion": 5,
+            "turnaround": 5,
+            "waiting": 0,
+            "response": 0
+          },
+          {
+            "id": "P2",
+            "completion": 8,
+            "turnaround": 7,
+            "waiting": 4,
+            "response": 4
+          },
+          {
+            "id": "P3",
+            "completion": 9,
+            "turnaround": 7,
+            "waiting": 6,
+            "response": 6
+          }
+        ],
+        "busyTime": 9,
+        "finishTime": 9,
+        "utilizationPercent": 100,
+        "averageWaiting": 3.3333333333333335,
+        "averageTurnaround": 6.333333333333333,
+        "averageResponse": 3.3333333333333335
+      }
+    },
+    {
+      "name": "rr-reference",
+      "input": {
+        "kind": "cpu",
+        "processes": [
+          {
+            "id": "P1",
+            "arrival": 0,
+            "burst": 5,
+            "priority": 2
+          },
+          {
+            "id": "P2",
+            "arrival": 1,
+            "burst": 3,
+            "priority": 1
+          },
+          {
+            "id": "P3",
+            "arrival": 2,
+            "burst": 1,
+            "priority": 3
+          }
+        ],
+        "algorithm": "rr",
+        "quantum": 2,
+        "contextSwitchCost": 0
+      },
+      "expected": {
+        "intervals": [
+          {
+            "id": "P1",
+            "start": 0,
+            "end": 2
+          },
+          {
+            "id": "P2",
+            "start": 2,
+            "end": 4
+          },
+          {
+            "id": "P3",
+            "start": 4,
+            "end": 5
+          },
+          {
+            "id": "P1",
+            "start": 5,
+            "end": 7
+          },
+          {
+            "id": "P2",
+            "start": 7,
+            "end": 8
+          },
+          {
+            "id": "P1",
+            "start": 8,
+            "end": 9
+          }
+        ],
+        "metrics": [
+          {
+            "id": "P1",
+            "completion": 9,
+            "turnaround": 9,
+            "waiting": 4,
+            "response": 0
+          },
+          {
+            "id": "P2",
+            "completion": 8,
+            "turnaround": 7,
+            "waiting": 4,
+            "response": 1
+          },
+          {
+            "id": "P3",
+            "completion": 5,
+            "turnaround": 3,
+            "waiting": 2,
+            "response": 2
+          }
+        ],
+        "busyTime": 9,
+        "finishTime": 9,
+        "utilizationPercent": 100,
+        "averageWaiting": 3.3333333333333335,
+        "averageTurnaround": 6.333333333333333,
+        "averageResponse": 1.0
+      }
+    },
+    {
+      "name": "initial-idle",
+      "input": {
+        "kind": "cpu",
+        "processes": [
+          {
+            "id": "P1",
+            "arrival": 3,
+            "burst": 2,
+            "priority": 1
+          }
+        ],
+        "algorithm": "fcfs",
+        "quantum": 2,
+        "contextSwitchCost": 0
+      },
+      "expected": {
+        "intervals": [
+          {
+            "id": null,
+            "start": 0,
+            "end": 3
+          },
+          {
+            "id": "P1",
+            "start": 3,
+            "end": 5
+          }
+        ],
+        "completion": 5,
+        "waiting": 0,
+        "turnaround": 2,
+        "response": 0,
+        "utilizationPercent": 40
+      }
+    },
+    {
+      "name": "rr-arrival-at-quantum",
+      "input": {
+        "kind": "cpu",
+        "processes": [
+          {
+            "id": "P1",
+            "arrival": 0,
+            "burst": 4,
+            "priority": 1
+          },
+          {
+            "id": "P2",
+            "arrival": 2,
+            "burst": 1,
+            "priority": 1
+          }
+        ],
+        "algorithm": "rr",
+        "quantum": 2,
+        "contextSwitchCost": 0
+      },
+      "expected": {
+        "intervals": [
+          {
+            "id": "P1",
+            "start": 0,
+            "end": 2
+          },
+          {
+            "id": "P2",
+            "start": 2,
+            "end": 3
+          },
+          {
+            "id": "P1",
+            "start": 3,
+            "end": 5
+          }
+        ],
+        "completionById": {
+          "P1": 5,
+          "P2": 3
+        }
+      }
+    }
+  ]
+}

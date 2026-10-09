@@ -1,0 +1,35 @@
+{
+  "format": "os-lab-simulator",
+  "schemaVersion": 1,
+  "id": "example-rr-001",
+  "name": "Round Robin classroom example",
+  "createdAt": "2026-10-09T00:00:00Z",
+  "updatedAt": "2026-10-09T00:00:00Z",
+  "engineVersion": "1.0.0",
+  "scenario": {
+    "kind": "cpu",
+    "processes": [
+      {
+        "id": "P1",
+        "arrival": 0,
+        "burst": 5,
+        "priority": 2
+      },
+      {
+        "id": "P2",
+        "arrival": 1,
+        "burst": 3,
+        "priority": 1
+      },
+      {
+        "id": "P3",
+        "arrival": 2,
+        "burst": 1,
+        "priority": 3
+      }
+    ],
+    "algorithm": "rr",
+    "quantum": 2,
+    "contextSwitchCost": 0
+  }
+}

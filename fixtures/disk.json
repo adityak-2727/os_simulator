@@ -1,0 +1,538 @@
+{
+  "format": "os-lab-fixture",
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "fcfs-reference",
+      "input": {
+        "kind": "disk",
+        "minCylinder": 0,
+        "maxCylinder": 199,
+        "initialHead": 53,
+        "direction": "higher",
+        "requests": [
+          {
+            "id": "D1",
+            "cylinder": 98
+          },
+          {
+            "id": "D2",
+            "cylinder": 183
+          },
+          {
+            "id": "D3",
+            "cylinder": 37
+          },
+          {
+            "id": "D4",
+            "cylinder": 122
+          },
+          {
+            "id": "D5",
+            "cylinder": 14
+          },
+          {
+            "id": "D6",
+            "cylinder": 124
+          },
+          {
+            "id": "D7",
+            "cylinder": 65
+          },
+          {
+            "id": "D8",
+            "cylinder": 67
+          }
+        ],
+        "algorithm": "fcfs"
+      },
+      "expected": {
+        "headPath": [
+          53,
+          98,
+          183,
+          37,
+          122,
+          14,
+          124,
+          65,
+          67
+        ],
+        "totalMovement": 640,
+        "moves": [
+          {
+            "from": 53,
+            "to": 98,
+            "distance": 45,
+            "kind": "service",
+            "requestId": "D1"
+          },
+          {
+            "from": 98,
+            "to": 183,
+            "distance": 85,
+            "kind": "service",
+            "requestId": "D2"
+          },
+          {
+            "from": 183,
+            "to": 37,
+            "distance": 146,
+            "kind": "service",
+            "requestId": "D3"
+          },
+          {
+            "from": 37,
+            "to": 122,
+            "distance": 85,
+            "kind": "service",
+            "requestId": "D4"
+          },
+          {
+            "from": 122,
+            "to": 14,
+            "distance": 108,
+            "kind": "service",
+            "requestId": "D5"
+          },
+          {
+            "from": 14,
+            "to": 124,
+            "distance": 110,
+            "kind": "service",
+            "requestId": "D6"
+          },
+          {
+            "from": 124,
+            "to": 65,
+            "distance": 59,
+            "kind": "service",
+            "requestId": "D7"
+          },
+          {
+            "from": 65,
+            "to": 67,
+            "distance": 2,
+            "kind": "service",
+            "requestId": "D8"
+          }
+        ],
+        "serviceOrder": [
+          "D1",
+          "D2",
+          "D3",
+          "D4",
+          "D5",
+          "D6",
+          "D7",
+          "D8"
+        ]
+      }
+    },
+    {
+      "name": "sstf-reference",
+      "input": {
+        "kind": "disk",
+        "minCylinder": 0,
+        "maxCylinder": 199,
+        "initialHead": 53,
+        "direction": "higher",
+        "requests": [
+          {
+            "id": "D1",
+            "cylinder": 98
+          },
+          {
+            "id": "D2",
+            "cylinder": 183
+          },
+          {
+            "id": "D3",
+            "cylinder": 37
+          },
+          {
+            "id": "D4",
+            "cylinder": 122
+          },
+          {
+            "id": "D5",
+            "cylinder": 14
+          },
+          {
+            "id": "D6",
+            "cylinder": 124
+          },
+          {
+            "id": "D7",
+            "cylinder": 65
+          },
+          {
+            "id": "D8",
+            "cylinder": 67
+          }
+        ],
+        "algorithm": "sstf"
+      },
+      "expected": {
+        "headPath": [
+          53,
+          65,
+          67,
+          37,
+          14,
+          98,
+          122,
+          124,
+          183
+        ],
+        "totalMovement": 236,
+        "moves": [
+          {
+            "from": 53,
+            "to": 65,
+            "distance": 12,
+            "kind": "service",
+            "requestId": "D7"
+          },
+          {
+            "from": 65,
+            "to": 67,
+            "distance": 2,
+            "kind": "service",
+            "requestId": "D8"
+          },
+          {
+            "from": 67,
+            "to": 37,
+            "distance": 30,
+            "kind": "service",
+            "requestId": "D3"
+          },
+          {
+            "from": 37,
+            "to": 14,
+            "distance": 23,
+            "kind": "service",
+            "requestId": "D5"
+          },
+          {
+            "from": 14,
+            "to": 98,
+            "distance": 84,
+            "kind": "service",
+            "requestId": "D1"
+          },
+          {
+            "from": 98,
+            "to": 122,
+            "distance": 24,
+            "kind": "service",
+            "requestId": "D4"
+          },
+          {
+            "from": 122,
+            "to": 124,
+            "distance": 2,
+            "kind": "service",
+            "requestId": "D6"
+          },
+          {
+            "from": 124,
+            "to": 183,
+            "distance": 59,
+            "kind": "service",
+            "requestId": "D2"
+          }
+        ],
+        "serviceOrder": [
+          "D7",
+          "D8",
+          "D3",
+          "D5",
+          "D1",
+          "D4",
+          "D6",
+          "D2"
+        ]
+      }
+    },
+    {
+      "name": "scan-reference",
+      "input": {
+        "kind": "disk",
+        "minCylinder": 0,
+        "maxCylinder": 199,
+        "initialHead": 53,
+        "direction": "higher",
+        "requests": [
+          {
+            "id": "D1",
+            "cylinder": 98
+          },
+          {
+            "id": "D2",
+            "cylinder": 183
+          },
+          {
+            "id": "D3",
+            "cylinder": 37
+          },
+          {
+            "id": "D4",
+            "cylinder": 122
+          },
+          {
+            "id": "D5",
+            "cylinder": 14
+          },
+          {
+            "id": "D6",
+            "cylinder": 124
+          },
+          {
+            "id": "D7",
+            "cylinder": 65
+          },
+          {
+            "id": "D8",
+            "cylinder": 67
+          }
+        ],
+        "algorithm": "scan"
+      },
+      "expected": {
+        "headPath": [
+          53,
+          65,
+          67,
+          98,
+          122,
+          124,
+          183,
+          199,
+          37,
+          14
+        ],
+        "totalMovement": 331,
+        "moves": [
+          {
+            "from": 53,
+            "to": 65,
+            "distance": 12,
+            "kind": "service",
+            "requestId": "D7"
+          },
+          {
+            "from": 65,
+            "to": 67,
+            "distance": 2,
+            "kind": "service",
+            "requestId": "D8"
+          },
+          {
+            "from": 67,
+            "to": 98,
+            "distance": 31,
+            "kind": "service",
+            "requestId": "D1"
+          },
+          {
+            "from": 98,
+            "to": 122,
+            "distance": 24,
+            "kind": "service",
+            "requestId": "D4"
+          },
+          {
+            "from": 122,
+            "to": 124,
+            "distance": 2,
+            "kind": "service",
+            "requestId": "D6"
+          },
+          {
+            "from": 124,
+            "to": 183,
+            "distance": 59,
+            "kind": "service",
+            "requestId": "D2"
+          },
+          {
+            "from": 183,
+            "to": 199,
+            "distance": 16,
+            "kind": "endpoint",
+            "requestId": null
+          },
+          {
+            "from": 199,
+            "to": 37,
+            "distance": 162,
+            "kind": "service",
+            "requestId": "D3"
+          },
+          {
+            "from": 37,
+            "to": 14,
+            "distance": 23,
+            "kind": "service",
+            "requestId": "D5"
+          }
+        ],
+        "serviceOrder": [
+          "D7",
+          "D8",
+          "D1",
+          "D4",
+          "D6",
+          "D2",
+          "D3",
+          "D5"
+        ]
+      }
+    },
+    {
+      "name": "cscan-reference",
+      "input": {
+        "kind": "disk",
+        "minCylinder": 0,
+        "maxCylinder": 199,
+        "initialHead": 53,
+        "direction": "higher",
+        "requests": [
+          {
+            "id": "D1",
+            "cylinder": 98
+          },
+          {
+            "id": "D2",
+            "cylinder": 183
+          },
+          {
+            "id": "D3",
+            "cylinder": 37
+          },
+          {
+            "id": "D4",
+            "cylinder": 122
+          },
+          {
+            "id": "D5",
+            "cylinder": 14
+          },
+          {
+            "id": "D6",
+            "cylinder": 124
+          },
+          {
+            "id": "D7",
+            "cylinder": 65
+          },
+          {
+            "id": "D8",
+            "cylinder": 67
+          }
+        ],
+        "algorithm": "cscan"
+      },
+      "expected": {
+        "headPath": [
+          53,
+          65,
+          67,
+          98,
+          122,
+          124,
+          183,
+          199,
+          0,
+          14,
+          37
+        ],
+        "totalMovement": 382,
+        "moves": [
+          {
+            "from": 53,
+            "to": 65,
+            "distance": 12,
+            "kind": "service",
+            "requestId": "D7"
+          },
+          {
+            "from": 65,
+            "to": 67,
+            "distance": 2,
+            "kind": "service",
+            "requestId": "D8"
+          },
+          {
+            "from": 67,
+            "to": 98,
+            "distance": 31,
+            "kind": "service",
+            "requestId": "D1"
+          },
+          {
+            "from": 98,
+            "to": 122,
+            "distance": 24,
+            "kind": "service",
+            "requestId": "D4"
+          },
+          {
+            "from": 122,
+            "to": 124,
+            "distance": 2,
+            "kind": "service",
+            "requestId": "D6"
+          },
+          {
+            "from": 124,
+            "to": 183,
+            "distance": 59,
+            "kind": "service",
+            "requestId": "D2"
+          },
+          {
+            "from": 183,
+            "to": 199,
+            "distance": 16,
+            "kind": "endpoint",
+            "requestId": null
+          },
+          {
+            "from": 199,
+            "to": 0,
+            "distance": 199,
+            "kind": "wrap",
+            "requestId": null
+          },
+          {
+            "from": 0,
+            "to": 14,
+            "distance": 14,
+            "kind": "service",
+            "requestId": "D5"
+          },
+          {
+            "from": 14,
+            "to": 37,
+            "distance": 23,
+            "kind": "service",
+            "requestId": "D3"
+          }
+        ],
+        "serviceOrder": [
+          "D7",
+          "D8",
+          "D1",
+          "D4",
+          "D6",
+          "D2",
+          "D5",
+          "D3"
+        ]
+      }
+    }
+  ]
+}

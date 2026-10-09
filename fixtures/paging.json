@@ -1,0 +1,561 @@
+{
+  "format": "os-lab-fixture",
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "fifo-reference",
+      "input": {
+        "kind": "paging",
+        "frames": 3,
+        "references": [
+          7,
+          0,
+          1,
+          2,
+          0,
+          3,
+          0,
+          4,
+          2,
+          3,
+          0,
+          3,
+          2
+        ],
+        "algorithm": "fifo"
+      },
+      "expected": {
+        "faults": 10,
+        "hits": 3,
+        "trace": [
+          {
+            "referenceIndex": 0,
+            "page": 7,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": null,
+            "frames": [
+              7,
+              null,
+              null
+            ]
+          },
+          {
+            "referenceIndex": 1,
+            "page": 0,
+            "hit": false,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              7,
+              0,
+              null
+            ]
+          },
+          {
+            "referenceIndex": 2,
+            "page": 1,
+            "hit": false,
+            "frameIndex": 2,
+            "evicted": null,
+            "frames": [
+              7,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 3,
+            "page": 2,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": 7,
+            "frames": [
+              2,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 4,
+            "page": 0,
+            "hit": true,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              2,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 5,
+            "page": 3,
+            "hit": false,
+            "frameIndex": 1,
+            "evicted": 0,
+            "frames": [
+              2,
+              3,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 6,
+            "page": 0,
+            "hit": false,
+            "frameIndex": 2,
+            "evicted": 1,
+            "frames": [
+              2,
+              3,
+              0
+            ]
+          },
+          {
+            "referenceIndex": 7,
+            "page": 4,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": 2,
+            "frames": [
+              4,
+              3,
+              0
+            ]
+          },
+          {
+            "referenceIndex": 8,
+            "page": 2,
+            "hit": false,
+            "frameIndex": 1,
+            "evicted": 3,
+            "frames": [
+              4,
+              2,
+              0
+            ]
+          },
+          {
+            "referenceIndex": 9,
+            "page": 3,
+            "hit": false,
+            "frameIndex": 2,
+            "evicted": 0,
+            "frames": [
+              4,
+              2,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 10,
+            "page": 0,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": 4,
+            "frames": [
+              0,
+              2,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 11,
+            "page": 3,
+            "hit": true,
+            "frameIndex": 2,
+            "evicted": null,
+            "frames": [
+              0,
+              2,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 12,
+            "page": 2,
+            "hit": true,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              0,
+              2,
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "lru-reference",
+      "input": {
+        "kind": "paging",
+        "frames": 3,
+        "references": [
+          7,
+          0,
+          1,
+          2,
+          0,
+          3,
+          0,
+          4,
+          2,
+          3,
+          0,
+          3,
+          2
+        ],
+        "algorithm": "lru"
+      },
+      "expected": {
+        "faults": 9,
+        "hits": 4,
+        "trace": [
+          {
+            "referenceIndex": 0,
+            "page": 7,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": null,
+            "frames": [
+              7,
+              null,
+              null
+            ]
+          },
+          {
+            "referenceIndex": 1,
+            "page": 0,
+            "hit": false,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              7,
+              0,
+              null
+            ]
+          },
+          {
+            "referenceIndex": 2,
+            "page": 1,
+            "hit": false,
+            "frameIndex": 2,
+            "evicted": null,
+            "frames": [
+              7,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 3,
+            "page": 2,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": 7,
+            "frames": [
+              2,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 4,
+            "page": 0,
+            "hit": true,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              2,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 5,
+            "page": 3,
+            "hit": false,
+            "frameIndex": 2,
+            "evicted": 1,
+            "frames": [
+              2,
+              0,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 6,
+            "page": 0,
+            "hit": true,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              2,
+              0,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 7,
+            "page": 4,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": 2,
+            "frames": [
+              4,
+              0,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 8,
+            "page": 2,
+            "hit": false,
+            "frameIndex": 2,
+            "evicted": 3,
+            "frames": [
+              4,
+              0,
+              2
+            ]
+          },
+          {
+            "referenceIndex": 9,
+            "page": 3,
+            "hit": false,
+            "frameIndex": 1,
+            "evicted": 0,
+            "frames": [
+              4,
+              3,
+              2
+            ]
+          },
+          {
+            "referenceIndex": 10,
+            "page": 0,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": 4,
+            "frames": [
+              0,
+              3,
+              2
+            ]
+          },
+          {
+            "referenceIndex": 11,
+            "page": 3,
+            "hit": true,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              0,
+              3,
+              2
+            ]
+          },
+          {
+            "referenceIndex": 12,
+            "page": 2,
+            "hit": true,
+            "frameIndex": 2,
+            "evicted": null,
+            "frames": [
+              0,
+              3,
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "optimal-reference",
+      "input": {
+        "kind": "paging",
+        "frames": 3,
+        "references": [
+          7,
+          0,
+          1,
+          2,
+          0,
+          3,
+          0,
+          4,
+          2,
+          3,
+          0,
+          3,
+          2
+        ],
+        "algorithm": "optimal"
+      },
+      "expected": {
+        "faults": 7,
+        "hits": 6,
+        "trace": [
+          {
+            "referenceIndex": 0,
+            "page": 7,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": null,
+            "frames": [
+              7,
+              null,
+              null
+            ]
+          },
+          {
+            "referenceIndex": 1,
+            "page": 0,
+            "hit": false,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              7,
+              0,
+              null
+            ]
+          },
+          {
+            "referenceIndex": 2,
+            "page": 1,
+            "hit": false,
+            "frameIndex": 2,
+            "evicted": null,
+            "frames": [
+              7,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 3,
+            "page": 2,
+            "hit": false,
+            "frameIndex": 0,
+            "evicted": 7,
+            "frames": [
+              2,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 4,
+            "page": 0,
+            "hit": true,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              2,
+              0,
+              1
+            ]
+          },
+          {
+            "referenceIndex": 5,
+            "page": 3,
+            "hit": false,
+            "frameIndex": 2,
+            "evicted": 1,
+            "frames": [
+              2,
+              0,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 6,
+            "page": 0,
+            "hit": true,
+            "frameIndex": 1,
+            "evicted": null,
+            "frames": [
+              2,
+              0,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 7,
+            "page": 4,
+            "hit": false,
+            "frameIndex": 1,
+            "evicted": 0,
+            "frames": [
+              2,
+              4,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 8,
+            "page": 2,
+            "hit": true,
+            "frameIndex": 0,
+            "evicted": null,
+            "frames": [
+              2,
+              4,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 9,
+            "page": 3,
+            "hit": true,
+            "frameIndex": 2,
+            "evicted": null,
+            "frames": [
+              2,
+              4,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 10,
+            "page": 0,
+            "hit": false,
+            "frameIndex": 1,
+            "evicted": 4,
+            "frames": [
+              2,
+              0,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 11,
+            "page": 3,
+            "hit": true,
+            "frameIndex": 2,
+            "evicted": null,
+            "frames": [
+              2,
+              0,
+              3
+            ]
+          },
+          {
+            "referenceIndex": 12,
+            "page": 2,
+            "hit": true,
+            "frameIndex": 0,
+            "evicted": null,
+            "frames": [
+              2,
+              0,
+              3
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

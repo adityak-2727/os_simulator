@@ -1,0 +1,289 @@
+{
+  "format": "os-lab-fixture",
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "first-fit-selection",
+      "input": {
+        "kind": "allocation",
+        "totalKiB": 1024,
+        "strategy": "first-fit",
+        "operations": [
+          {
+            "kind": "allocate",
+            "id": "A",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "B",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "allocate",
+            "id": "C",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "D",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "free",
+            "id": "B"
+          },
+          {
+            "kind": "allocate",
+            "id": "E",
+            "sizeKiB": 200
+          }
+        ]
+      },
+      "expected": {
+        "holesBeforeLast": [
+          {
+            "start": 100,
+            "end": 400
+          },
+          {
+            "start": 800,
+            "end": 1024
+          }
+        ],
+        "lastAllocation": {
+          "id": "E",
+          "start": 100,
+          "end": 300
+        },
+        "totalFreeKiB": 324
+      }
+    },
+    {
+      "name": "best-fit-selection",
+      "input": {
+        "kind": "allocation",
+        "totalKiB": 1024,
+        "strategy": "best-fit",
+        "operations": [
+          {
+            "kind": "allocate",
+            "id": "A",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "B",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "allocate",
+            "id": "C",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "D",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "free",
+            "id": "B"
+          },
+          {
+            "kind": "allocate",
+            "id": "E",
+            "sizeKiB": 200
+          }
+        ]
+      },
+      "expected": {
+        "holesBeforeLast": [
+          {
+            "start": 100,
+            "end": 400
+          },
+          {
+            "start": 800,
+            "end": 1024
+          }
+        ],
+        "lastAllocation": {
+          "id": "E",
+          "start": 800,
+          "end": 1000
+        },
+        "totalFreeKiB": 324
+      }
+    },
+    {
+      "name": "worst-fit-selection",
+      "input": {
+        "kind": "allocation",
+        "totalKiB": 1024,
+        "strategy": "worst-fit",
+        "operations": [
+          {
+            "kind": "allocate",
+            "id": "A",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "B",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "allocate",
+            "id": "C",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "D",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "free",
+            "id": "B"
+          },
+          {
+            "kind": "allocate",
+            "id": "E",
+            "sizeKiB": 200
+          }
+        ]
+      },
+      "expected": {
+        "holesBeforeLast": [
+          {
+            "start": 100,
+            "end": 400
+          },
+          {
+            "start": 800,
+            "end": 1024
+          }
+        ],
+        "lastAllocation": {
+          "id": "E",
+          "start": 100,
+          "end": 300
+        },
+        "totalFreeKiB": 324
+      }
+    },
+    {
+      "name": "fragmented-failure",
+      "input": {
+        "kind": "allocation",
+        "totalKiB": 1024,
+        "strategy": "first-fit",
+        "operations": [
+          {
+            "kind": "allocate",
+            "id": "A",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "B",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "allocate",
+            "id": "C",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "D",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "free",
+            "id": "B"
+          },
+          {
+            "kind": "allocate",
+            "id": "E",
+            "sizeKiB": 400
+          }
+        ]
+      },
+      "expected": {
+        "lastOutcome": "insufficient-contiguous-space",
+        "totalFreeKiB": 524,
+        "largestHoleKiB": 300,
+        "stateUnchangedByLast": true
+      }
+    },
+    {
+      "name": "coalescing",
+      "input": {
+        "kind": "allocation",
+        "totalKiB": 1024,
+        "strategy": "first-fit",
+        "operations": [
+          {
+            "kind": "allocate",
+            "id": "A",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "B",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "allocate",
+            "id": "C",
+            "sizeKiB": 100
+          },
+          {
+            "kind": "allocate",
+            "id": "D",
+            "sizeKiB": 300
+          },
+          {
+            "kind": "free",
+            "id": "B"
+          },
+          {
+            "kind": "free",
+            "id": "C"
+          },
+          {
+            "kind": "free",
+            "id": "D"
+          }
+        ]
+      },
+      "expected": {
+        "afterFreeC": [
+          {
+            "start": 100,
+            "end": 500
+          },
+          {
+            "start": 800,
+            "end": 1024
+          }
+        ],
+        "finalHoles": [
+          {
+            "start": 100,
+            "end": 1024
+          }
+        ],
+        "remainingAllocations": [
+          {
+            "id": "A",
+            "start": 0,
+            "end": 100
+          }
+        ]
+      }
+    }
+  ]
+}

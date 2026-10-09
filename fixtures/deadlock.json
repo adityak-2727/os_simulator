@@ -1,0 +1,553 @@
+{
+  "format": "os-lab-fixture",
+  "schemaVersion": 1,
+  "cases": [
+    {
+      "name": "banker-safe",
+      "input": {
+        "kind": "deadlock",
+        "mode": "banker",
+        "processIds": [
+          "P0",
+          "P1",
+          "P2",
+          "P3",
+          "P4"
+        ],
+        "resourceIds": [
+          "A",
+          "B",
+          "C"
+        ],
+        "total": [
+          10,
+          5,
+          7
+        ],
+        "allocation": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            2
+          ]
+        ],
+        "max": [
+          [
+            7,
+            5,
+            3
+          ],
+          [
+            3,
+            2,
+            2
+          ],
+          [
+            9,
+            0,
+            2
+          ],
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            4,
+            3,
+            3
+          ]
+        ]
+      },
+      "expected": {
+        "status": "safe",
+        "available": [
+          3,
+          3,
+          2
+        ],
+        "safeSequence": [
+          "P1",
+          "P3",
+          "P0",
+          "P2",
+          "P4"
+        ],
+        "workTrace": [
+          [
+            3,
+            3,
+            2
+          ],
+          [
+            5,
+            3,
+            2
+          ],
+          [
+            7,
+            4,
+            3
+          ],
+          [
+            7,
+            5,
+            3
+          ],
+          [
+            10,
+            5,
+            5
+          ],
+          [
+            10,
+            5,
+            7
+          ]
+        ]
+      }
+    },
+    {
+      "name": "safe-request",
+      "input": {
+        "kind": "deadlock",
+        "mode": "banker",
+        "processIds": [
+          "P0",
+          "P1",
+          "P2",
+          "P3",
+          "P4"
+        ],
+        "resourceIds": [
+          "A",
+          "B",
+          "C"
+        ],
+        "total": [
+          10,
+          5,
+          7
+        ],
+        "allocation": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            2
+          ]
+        ],
+        "max": [
+          [
+            7,
+            5,
+            3
+          ],
+          [
+            3,
+            2,
+            2
+          ],
+          [
+            9,
+            0,
+            2
+          ],
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            4,
+            3,
+            3
+          ]
+        ],
+        "request": {
+          "processId": "P1",
+          "amount": [
+            1,
+            0,
+            2
+          ]
+        }
+      },
+      "expected": {
+        "status": "granted",
+        "stateUnchanged": false,
+        "availableAfter": [
+          2,
+          3,
+          0
+        ],
+        "allocationRowAfter": [
+          3,
+          0,
+          2
+        ],
+        "safeSequence": [
+          "P1",
+          "P3",
+          "P0",
+          "P2",
+          "P4"
+        ]
+      }
+    },
+    {
+      "name": "unsafe-request",
+      "input": {
+        "kind": "deadlock",
+        "mode": "banker",
+        "processIds": [
+          "P0",
+          "P1",
+          "P2",
+          "P3",
+          "P4"
+        ],
+        "resourceIds": [
+          "A",
+          "B",
+          "C"
+        ],
+        "total": [
+          10,
+          5,
+          7
+        ],
+        "allocation": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            2
+          ]
+        ],
+        "max": [
+          [
+            7,
+            5,
+            3
+          ],
+          [
+            3,
+            2,
+            2
+          ],
+          [
+            9,
+            0,
+            2
+          ],
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            4,
+            3,
+            3
+          ]
+        ],
+        "request": {
+          "processId": "P4",
+          "amount": [
+            3,
+            3,
+            0
+          ]
+        }
+      },
+      "expected": {
+        "status": "wait-for-safety",
+        "stateUnchanged": true
+      }
+    },
+    {
+      "name": "unavailable-request",
+      "input": {
+        "kind": "deadlock",
+        "mode": "banker",
+        "processIds": [
+          "P0",
+          "P1",
+          "P2",
+          "P3",
+          "P4"
+        ],
+        "resourceIds": [
+          "A",
+          "B",
+          "C"
+        ],
+        "total": [
+          10,
+          5,
+          7
+        ],
+        "allocation": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            2
+          ]
+        ],
+        "max": [
+          [
+            7,
+            5,
+            3
+          ],
+          [
+            3,
+            2,
+            2
+          ],
+          [
+            9,
+            0,
+            2
+          ],
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            4,
+            3,
+            3
+          ]
+        ],
+        "request": {
+          "processId": "P0",
+          "amount": [
+            0,
+            4,
+            0
+          ]
+        }
+      },
+      "expected": {
+        "status": "wait-for-availability",
+        "stateUnchanged": true
+      }
+    },
+    {
+      "name": "excess-claim-request",
+      "input": {
+        "kind": "deadlock",
+        "mode": "banker",
+        "processIds": [
+          "P0",
+          "P1",
+          "P2",
+          "P3",
+          "P4"
+        ],
+        "resourceIds": [
+          "A",
+          "B",
+          "C"
+        ],
+        "total": [
+          10,
+          5,
+          7
+        ],
+        "allocation": [
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            2,
+            0,
+            0
+          ],
+          [
+            3,
+            0,
+            2
+          ],
+          [
+            2,
+            1,
+            1
+          ],
+          [
+            0,
+            0,
+            2
+          ]
+        ],
+        "max": [
+          [
+            7,
+            5,
+            3
+          ],
+          [
+            3,
+            2,
+            2
+          ],
+          [
+            9,
+            0,
+            2
+          ],
+          [
+            2,
+            2,
+            2
+          ],
+          [
+            4,
+            3,
+            3
+          ]
+        ],
+        "request": {
+          "processId": "P1",
+          "amount": [
+            2,
+            0,
+            0
+          ]
+        }
+      },
+      "expected": {
+        "status": "invalid",
+        "stateUnchanged": true
+      }
+    },
+    {
+      "name": "single-instance-cycle",
+      "input": {
+        "kind": "deadlock",
+        "mode": "graph",
+        "processIds": [
+          "P1",
+          "P2"
+        ],
+        "resourceIds": [
+          "R1",
+          "R2"
+        ],
+        "allocations": [
+          {
+            "resourceId": "R1",
+            "processId": "P1"
+          },
+          {
+            "resourceId": "R2",
+            "processId": "P2"
+          }
+        ],
+        "requests": [
+          {
+            "processId": "P1",
+            "resourceId": "R2"
+          },
+          {
+            "processId": "P2",
+            "resourceId": "R1"
+          }
+        ]
+      },
+      "expected": {
+        "status": "deadlocked",
+        "cycle": [
+          "P1",
+          "R2",
+          "P2",
+          "R1",
+          "P1"
+        ]
+      }
+    }
+  ]
+}
