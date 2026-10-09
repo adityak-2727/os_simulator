@@ -132,6 +132,10 @@ Use `prompts/PHASE_02_CPU.md`; read `docs/07_CPU_SCHEDULING_SPEC.md` and CPU ref
 | `git diff --check` | Passed. Git reports normal Windows LF/CRLF conversion notices. |
 | `Invoke-WebRequest -Uri http://127.0.0.1:5173/ -UseBasicParsing` | Existing development server returned HTTP 200; current code available at `http://127.0.0.1:5173/#/cpu`. |
 | `Start-Process -FilePath 'C:/Program Files/Google/Chrome/Application/chrome.exe' -ArgumentList 'http://127.0.0.1:5173/#/cpu' -WindowStyle Hidden` | Approved local Chrome launch succeeded. Visual verification used actual Playwright screenshots; browser-control connector remains unavailable. |
+| `git add BUILD_STATUS.md README.md package.json package-lock.json playwright.config.ts src tests artifacts`, `git diff --cached --check` | Approved staging succeeded; staged whitespace check passed. Historical foundation screenshots unchanged. |
+| `git commit -m "Implement CPU schedulers, replay inspection, and algorithm comparison"` | Succeeded: `2e9188b`, 43 files. Commit title contains change details without a phase label, as requested. |
+| `git push origin main` | Sandbox network attempt failed; approved retry succeeded, updating requested remote `main` from `98e0269` to `2e9188b`. |
+| `git status --short`, `git rev-list --left-right --count HEAD...origin/main` | Clean after implementation push; divergence `0 0`. Git handover results are recorded by the subsequent documentation-only commit. |
 
 ### Browser evidence, fixes, and measurements
 
