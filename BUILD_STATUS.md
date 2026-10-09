@@ -60,12 +60,16 @@ None needed for the default browser-only v1. A mandatory C or C++ lab requiremen
 | `npm run typecheck` | Final run passed. Initial literal-array inference and exact-optional errors corrected. |
 | `npm run lint` | Final run passed, zero warnings/errors. Initial Fast Refresh export warning corrected. |
 | `npm run test:run` | Passed: 13 tests in one file. Hand-derived event times/intervals, determinism, nested immutability, invalid values, trace-budget error, duration sweep invariants, cursor bounds, pause/reset/speed/seek, trace reuse, and input invalidation. |
-| `npm run build` | Passed, 26 modules transformed and `dist/` generated; JS approximately 248.85 kB (76.90 kB gzip), CSS approximately 20.71 kB (5.42 kB gzip). |
+| `npm run build` | Passed, 26 modules transformed and `dist/` generated; JS approximately 248.85 kB (76.90 kB gzip), CSS approximately 20.72 kB (5.43 kB gzip). |
 | `npm run test:e2e` | Final run passed: 6 checks in local Chrome at 1440×900, 1024×900, and 390×844. Lifecycle, validation, invalidation, recomputation, keyboard/focus, event selection, route refresh/help/dashboard/unknown routes, and no page-level horizontal overflow. |
 | `npm run format`, `npm run format:check` | Application formatting passed. Specification Markdown files excluded. |
 | `git diff --check` | Passed. |
 | `npm run dev -- --port 5173 --strictPort` | Approved retry succeeded; running at `http://127.0.0.1:5173/` at handover. |
 | `Start-Process -FilePath 'C:/Program Files/Google/Chrome/Application/chrome.exe' -ArgumentList 'http://127.0.0.1:5173/#/cpu'` | Approved command succeeded. Browser-control connector exposed no browsers; headed tab not separately inspected through that connector. |
+| `git add .`, `git diff --cached --check` | Sandbox denied `.git/index.lock`; approved staging succeeded. Staged whitespace check passed. |
+| `git commit -m "Build Phase 1 foundation and deterministic replay workbench"` | Succeeded: application commit `07a1b20`, including the preserved specification pack and inspected screenshots. |
+| `git push -u origin main` | Sandbox network attempt failed; approved retry succeeded and created `main` on the requested GitHub repository, tracking `origin/main`. |
+| `git status --short`, `git log -1`, `git diff --check` | Clean after the application commit and push; whitespace check passed. This handover evidence is recorded in a subsequent documentation-only commit. |
 
 ### Browser evidence and fixes
 
