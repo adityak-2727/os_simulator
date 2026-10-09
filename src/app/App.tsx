@@ -4,6 +4,9 @@ import { PreviewLab } from '../features/foundation/PreviewLab';
 import { Button, Icon } from '../components/Primitives';
 import { CpuLab } from '../features/cpu/CpuLab';
 import { useCpu } from '../features/cpu/CpuContext';
+import { useMemory } from '../features/memory/MemoryContext';
+import { AllocationLab } from '../features/memory/AllocationLab';
+import { PagingLab } from '../features/memory/PagingLab';
 
 const routes = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', phase: 7 },
@@ -32,6 +35,7 @@ export function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { dispatch } = useLab();
   const { dispatch: cpuDispatch } = useCpu();
+  const { dispatch: memoryDispatch } = useMemory();
   const current = routes.find((item) => item.id === route);
   useEffect(() => {
     const navigate = () => {
@@ -39,10 +43,20 @@ export function App() {
       setMenuOpen(false);
       dispatch({ type: 'replay', action: { type: 'pause' } });
       cpuDispatch({ type: 'replay', action: { type: 'pause' } });
+      memoryDispatch({
+        type: 'replay',
+        lab: 'allocation',
+        action: { type: 'pause' },
+      });
+      memoryDispatch({
+        type: 'replay',
+        lab: 'paging',
+        action: { type: 'pause' },
+      });
     };
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
-  }, [dispatch, cpuDispatch]);
+  }, [dispatch, cpuDispatch, memoryDispatch]);
   useEffect(() => {
     document.title = `${current?.label ?? (route === 'replay-preview' ? 'Replay preview' : 'Page unavailable')} · OS Lab Simulator`;
   }, [current, route]);
@@ -78,7 +92,7 @@ export function App() {
             >
               <Icon name={item.icon} />
               <span>{item.label}</span>
-              {item.id !== 'cpu' && item.id !== 'help' && (
+              {!['cpu', 'allocation', 'paging', 'help'].includes(item.id) && (
                 <span
                   className="nav-phase"
                   aria-label={`Available in phase ${item.phase}`}
@@ -91,7 +105,7 @@ export function App() {
         </nav>
         <div className="rail-footer">
           <span className="phase-tag">LOCAL LAB</span>
-          <p>CPU scheduling & replay</p>
+          <p>CPU & memory laboratories</p>
           <span className="subtle small">
             Local browser simulation
             <br />
@@ -126,6 +140,10 @@ export function App() {
         <main id="main-content" tabIndex={-1}>
           {route === 'cpu' ? (
             <CpuLab />
+          ) : route === 'allocation' ? (
+            <AllocationLab />
+          ) : route === 'paging' ? (
+            <PagingLab />
           ) : route === 'replay-preview' ? (
             <PreviewLab />
           ) : route === 'help' ? (
@@ -173,9 +191,9 @@ function Unavailable({
             : 'Choose a lab from the navigation'}
         </h2>
         <p>
-          The CPU scheduling lab is available with four algorithms and replay.
-          Other algorithms and experiment storage will be added in their
-          specified phases.
+          CPU scheduling, memory allocation, and page replacement are available
+          with replay. Other algorithms and experiment storage will be added in
+          their specified phases.
         </p>
         <a className="button primary" href="#/cpu">
           Open CPU scheduling
@@ -205,6 +223,20 @@ function Dashboard() {
           Open CPU scheduling
         </a>
         <div className="section-divider" />
+        <h2>Explore memory</h2>
+        <p>
+          Compare First Fit, Best Fit, and Worst Fit allocations, or inspect
+          FIFO, LRU, and Optimal page replacement.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <a href="#/allocation" className="button">
+            Open memory allocation
+          </a>
+          <a href="#/paging" className="button">
+            Open page replacement
+          </a>
+        </div>
+        <div className="section-divider" />
         <h2>Module availability</h2>
         <div className="availability-list">
           {routes
@@ -218,7 +250,9 @@ function Dashboard() {
                 <span className="subtle">
                   {item.id === 'cpu'
                     ? 'Available · four algorithms'
-                    : `Unavailable · Phase ${item.phase}`}
+                    : item.id === 'allocation' || item.id === 'paging'
+                      ? 'Available · three algorithms'
+                      : `Unavailable · Phase ${item.phase}`}
                 </span>
               </a>
             ))}
@@ -321,6 +355,21 @@ function Help() {
           During replay, incomplete CT/TAT/WT values remain blank. Averages use
           completed processes only. The comparison workspace is explicitly
           labeled as final results.
+        </p>
+        <h2>Memory and paging model</h2>
+        <p>
+          Allocation uses exact integer KiB sizes and half-open address ranges.
+          First Fit chooses the first fitting hole; Best Fit the smallest; Worst
+          Fit the largest. Ties use lower addresses. Free coalesces both
+          neighboring holes. Invalid live-ID operations and failed fits are
+          visible steps that preserve memory.
+        </p>
+        <p>
+          Paging uses empty frames and ordered page references. FIFO preserves
+          insertion order on hits; LRU updates recency. Optimal knows future
+          references and uses the lowest frame index for ties. Ratios use only
+          processed references and remain unavailable at the initial frame.
+          Allocation and paging step indices are not CPU time or milliseconds.
         </p>
         <h2>Replay infrastructure example</h2>
         <p>

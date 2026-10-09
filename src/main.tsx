@@ -4,6 +4,7 @@ import { App } from './app/App';
 import { LabProvider } from './app/LabProvider';
 import { AppErrorBoundary } from './app/AppErrorBoundary';
 import { CpuProvider } from './features/cpu/CpuProvider';
+import { MemoryProvider } from './features/memory/MemoryProvider';
 import './styles/index.css';
 
 const root = document.getElementById('root');
@@ -12,9 +13,11 @@ createRoot(root).render(
   <StrictMode>
     <LabProvider>
       <CpuProvider>
-        <AppErrorBoundary>
-          <App />
-        </AppErrorBoundary>
+        <MemoryProvider>
+          <AppErrorBoundary>
+            <App />
+          </AppErrorBoundary>
+        </MemoryProvider>
       </CpuProvider>
     </LabProvider>
   </StrictMode>,

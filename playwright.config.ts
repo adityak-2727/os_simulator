@@ -8,6 +8,14 @@ export default defineConfig({
   use: { baseURL: 'http://127.0.0.1:4173', trace: 'retain-on-failure' },
   projects: [
     {
+      name: 'compact',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 768, height: 900 },
+        channel: 'chrome',
+      },
+    },
+    {
       name: 'tablet',
       use: {
         ...devices['Desktop Chrome'],

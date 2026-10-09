@@ -140,15 +140,15 @@ test('keyboard, routes, scroll containment, and screenshots', async ({
     path: `artifacts/replay-preview-${testInfo.project.name}.png`,
     fullPage: true,
   });
-  if (testInfo.project.name === 'narrow')
+  if ((page.viewportSize()?.width ?? 1440) <= 768)
     await page.getByRole('button', { name: 'Open navigation' }).click();
-  await page.getByRole('link', { name: /Memory allocation/ }).click();
+  await page.getByRole('link', { name: /Deadlock/ }).click();
   await expect(
     page.getByRole('heading', { name: 'This lab is not implemented yet' }),
   ).toBeVisible();
   await page.reload();
   await expect(
-    page.getByRole('heading', { name: 'Memory allocation', exact: true }),
+    page.getByRole('heading', { name: 'Deadlock', exact: true }),
   ).toBeVisible();
   await page.getByRole('link', { name: 'Open CPU scheduling' }).click();
   await expect(

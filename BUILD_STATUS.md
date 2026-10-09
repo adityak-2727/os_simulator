@@ -1,12 +1,12 @@
 # Build status
 
-Phases 1 and 2 are complete. The original specification pack and foundation preview are preserved. Phases 3–8 have not been implemented.
+Phases 1–3 are complete. The original specification pack, CPU work, and foundation preview are preserved. Phases 4–8 have not been implemented.
 
 | Phase | Status | Evidence |
 | --- | --- | --- |
 | 1 Foundation | Complete | Typecheck, clean lint, 13 unit tests, 6 browser checks, production build, inspected screenshots |
 | 2 CPU scheduling | Complete | Six reference fixtures, 64 total unit tests, 21 full browser checks, 3 final production comparison checks, typecheck/lint/build, inspected desktop/tablet/phone screenshots |
-| 3 Memory and paging | Not started | No application code yet |
+| 3 Memory and paging | Complete | All allocation/paging fixtures and intermediate frames, 106 total unit tests, 48 full browser checks at four widths, 8 production comparison checks, clean typecheck/lint/build, inspected screenshots |
 | 4 Deadlock | Not started | No application code yet |
 | 5 Synchronization | Not started | No application code yet |
 | 6 Disk scheduling | Not started | No application code yet |
@@ -15,7 +15,7 @@ Phases 1 and 2 are complete. The original specification pack and foundation prev
 
 ## Current task
 
-CPU scheduling handover complete. Next requested task: Phase 3 using `prompts/PHASE_03_MEMORY.md`. No later phase was started.
+Memory allocation and paging handover complete. Next task when requested: Phase 4 using `prompts/PHASE_04_DEADLOCK.md`. No later phase was started.
 
 ## Update format
 
@@ -155,3 +155,63 @@ Use `prompts/PHASE_02_CPU.md`; read `docs/07_CPU_SCHEDULING_SPEC.md` and CPU ref
 ### Next task
 
 Use `prompts/PHASE_03_MEMORY.md`, reading `docs/08_MEMORY_AND_PAGING_SPEC.md` and the relevant memory/page fixtures. Implement First Fit, Best Fit, Worst Fit, FIFO, LRU, and Optimal in that milestone only when requested.
+
+## 2026-10-09 — Phase 3 memory allocation and paging
+
+### What works
+
+- Pure First Fit, Best Fit, and Worst Fit select the required address-ordered holes, use lower addresses for ties, split at the low end, omit zero-size remainders, free exact live allocations, and coalesce both neighbors. Frozen snapshots cover the full capacity with no gaps or overlaps. Every operation produces one visible event and frame.
+- No-fit outcomes distinguish insufficient total free space from sufficient but fragmented free space. Rejected steps retain the exact previous segment array. Duplicate live IDs and unknown frees are runtime rejections; freed IDs may be reused. Static validation rejects malformed fields before trace construction. Liveness is evaluated at the operation's actual state because prior fit outcomes can differ by strategy.
+- Allocation editor supports capacity, strategy, add/remove/reorder, allocate/free, IDs, sizes, three labeled examples, inline validation, and 200-operation/65,536-KiB bounds. The address-labeled proportional SVG map has height zoom and internal scrolling; its numeric ledger gives all exact half-open ranges. Selected-frame metrics include allocated/free KiB, largest hole, and free space outside the largest hole, with no invented fragmentation percentage or overhead.
+- Pure FIFO, LRU, and Optimal fill the lowest empty index. FIFO hits preserve insertion order; LRU hits update recency; Optimal selects farthest next use, treating never-again as infinity and breaking ties by frame index. Each event carries reference/page, chosen frame, hit/fault, evicted page, resulting frames, candidate evidence, and a precise reason.
+- Paging editor supports comma/space-separated references, 1–12 frames, 1–200 references, page IDs 0–9,999, algorithm selection, and inline invalid/empty states. Reference cursor, resident frame table, frame-history matrix, equivalent outcome table, counts/ratios, and inspector all use the selected replay frame. No processed references means unavailable ratios; no millisecond model is implied.
+- Independent Context/reducer allocation and paging state preserves each lab's inputs and pauses playback on navigation. Run/Pause/Replay, Previous/Next, Reset, speed, keyboard cursor/event selection, and edits follow the existing immutable replay lifecycle. Editing either source stops its playback and clears both stale result and comparison while preserving the other lab.
+- Allocation compares identical capacity/ordered operations from empty memory; paging compares identical references/frame count. Recharts visuals include exact tables, shared input details, and trace links. Comparison code loads lazily and shares the chart bundle with CPU. CPU engines/UI remain unchanged.
+- Real `#/allocation` and `#/paging` routes, updated availability/help, model notes, and guided exercises. Save/export remains honestly unavailable pending integration. Ready, running, paused, completed, empty, invalid, and rejected-operation states are explicit; unsuccessful operations do not falsely imply an algorithm crash or stopped operation list.
+
+### Important changed files
+
+- New engines: `src/engine/memory/{types,validation,allocation,paging}.ts`.
+- New memory UI/state: `src/features/memory/memoryState.ts`, `MemoryContext.ts`, `MemoryProvider.tsx`, `ReplayControls.tsx`, `MemoryEditors.tsx`, `MemoryShared.tsx`, `MemoryMap.tsx`, `AllocationLab.tsx`, `PagingLab.tsx`, `MemoryComparison.tsx`.
+- Integration/design: `src/app/App.tsx`, `src/main.tsx`, `src/styles/index.css`; existing shell/layout extended.
+- Verification: `tests/unit/memory.test.ts`, `tests/unit/memoryState.test.ts`, `tests/browser/memory.spec.ts`, `tests/browser/foundation.spec.ts`, `playwright.config.ts`.
+- Docs/evidence: `README.md`, this file, 24 new allocation/paging screenshots at four widths, and 5 new 768-pixel CPU/preview regression screenshots. Existing historical screenshots restored after test regeneration. Specification documents, fixtures, dependencies, lockfile, and CPU implementation preserved.
+
+### Commands actually executed
+
+| Command | Result |
+| --- | --- |
+| `git status --short` | Initial workspace clean; continued from the completed CPU build. |
+| `npm run typecheck` | Passed. Initial Recharts generic inference mismatch resolved with a shared typed chart-row shape; no `any` added. Successful build also performs strict checking. |
+| `npm run test:run` | Final run: 106 passed across 5 files, including 42 new memory engine/state tests. All five allocation fixtures and all three complete paging traces match. Independent conservation, adjacency, IDs, frame uniqueness, accounting, fit/tie/coalescing/rejection, recency, future ties, limits, immutable determinism, comparisons, and replay/state isolation checked. |
+| `npm run lint` | Final run passed without warnings/errors. Initial two Fast Refresh helper-export warnings resolved by making component-local helpers private. |
+| `npm run format`, `npm run format:check` | Passed. Original specification Markdown excluded. |
+| `npm run build` | Passed, 626 modules. Main JS 334.07 kB (98.12 kB gzip), shared chart JS 370.41 kB (106.40 kB gzip), memory comparison 5.46 kB (1.69 kB gzip), CPU comparison 4.71 kB (1.52 kB gzip), CSS 30.01 kB (7.11 kB gzip). No chunk-size warning. |
+| `npm run test:e2e -- tests/browser/memory.spec.ts` | Initial run: 16 passed / 4 failed; missing semantic metrics region fixed. |
+| `npm run test:e2e -- tests/browser/memory.spec.ts -g "paging history"` | 4 passed after the metrics region fix. |
+| `npm run test:e2e` | Final run: 48 passed in 37.4 seconds, 3 workers, no retries. Chrome at 1440×900, 1024×900, 768×900, and 390×844. Includes full CPU/foundation regression, memory fit/fragmentation preservation, two-sided coalescing, exact fit, duplicate/unknown rejection, order editing, independent state/navigation pause, replay speed, 10/9/7 comparison, actual eviction/recency, invalid/empty inputs, keyboard/focus, no page overflow, and engine measurements. |
+| `npm run preview -- --port 4173 --strictPort` | Approved command successfully served the production build. |
+| `npm run test:e2e -- tests/browser/memory.spec.ts -g "comparison"` | 8 passed in 8.8 seconds against production preview. Both lazy comparisons, exact metrics, shared inputs, trace links, allocation outcomes, and invalid/empty states checked at all four widths. |
+| `git restore --worktree artifacts` | Approved command restored tracked historical screenshots generated again by regression tests, retaining new memory and compact-width evidence. |
+| `git diff --check` | Passed; normal Windows LF/CRLF notices only. |
+| `Invoke-WebRequest -Uri http://127.0.0.1:5173/ -UseBasicParsing` | HTTP 200. Existing development server serves the new routes. |
+| `Start-Process -FilePath 'C:/Program Files/Google/Chrome/Application/chrome.exe' -ArgumentList 'http://127.0.0.1:5173/#/allocation' -WindowStyle Normal` | Approved Chrome launch succeeded for local application review. Visual QA used actual Playwright screenshots. |
+
+### Evidence and fixes
+
+- Inspected desktop allocation/coalescing and paging history, tablet allocation comparison, compact paging comparison, phone paging history and fragmentation failure, and desktop invalid/empty paging screenshots. Map labels include 0 and capacity; exact tables cover small segments and clipped/long IDs. Scroll stays inside maps/tables/editors. Process IDs and colors agree between allocation map and ledger.
+- First memory browser run exposed a missing accessible `region` on the metrics container; screenshot review exposed a missing shared grid class causing cramped stacked metrics. Added semantic regions and the shared metric layout; rerun passed all four paging workflows.
+- First full run passed 47/48: the foundation test opened navigation only for the project named narrow, so its newly added 768-pixel case could not click the collapsed navigation. Updated that test to use the actual viewport breakpoint. Final 48 passed. No scheduling reference or expected value was changed.
+- Final local performance samples: Chrome 156.0.8078.4, Windows, Intel Core i7-14700HX. Two-operation allocation took 0–0.2 ms; reference FIFO (13 references) 0–0.1 ms, with zero indicating timer resolution. Supported allocation maximum (200 one-KiB allocations in 65,536 KiB, Worst Fit) produced 200 events and 65,336 free KiB in 3.3–4.1 ms. Optimal with 12 frames and 200 distinct references produced 200 events/faults in 1.7–1.9 ms. Measurements occurred under concurrent browser testing and are not cross-device guarantees or exhaustive UI stress benchmarks.
+
+### Limitations and scope
+
+- Exact variable partitions use integer KiB with no compaction, alignment overhead, or modeled internal fragmentation. Optimal deliberately knows future references. Memory/paging step indices have no CPU-time or page-fault latency interpretation.
+- Inputs/results are in-memory; versioned localStorage and import/export remain Phase 7. Resource graphs/Banker, synchronization, disk, and integration remain unimplemented. No later phase is complete or started, no new dependency required, and no backend/authentication/AI service/database/deployment added.
+- Chrome verified at four widths. Other browsers, assistive-technology sessions, forced render-error recovery, and full accessibility release audit remain unverified. Maximum engine construction measured; exhaustive maximum-size UI stress testing is not claimed.
+- Existing Windows sandbox child-process/Git-write restrictions handled through approved commands. No requested completion gate remains unverified. Historical specifications, fixture expected results, and CPU source preserved.
+- New commit messages use change details without phase labels, retaining the user's preference. Phase metadata remains in this required status history and specification pack.
+
+### Next task
+
+Use `prompts/PHASE_04_DEADLOCK.md` and `docs/09_DEADLOCK_SPEC.md` with `fixtures/deadlock.json`. Build single-instance resource graphs, Banker's safety calculation, and transactional resource requests only when requested.
