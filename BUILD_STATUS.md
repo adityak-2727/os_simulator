@@ -196,6 +196,10 @@ Use `prompts/PHASE_03_MEMORY.md`, reading `docs/08_MEMORY_AND_PAGING_SPEC.md` an
 | `git diff --check` | Passed; normal Windows LF/CRLF notices only. |
 | `Invoke-WebRequest -Uri http://127.0.0.1:5173/ -UseBasicParsing` | HTTP 200. Existing development server serves the new routes. |
 | `Start-Process -FilePath 'C:/Program Files/Google/Chrome/Application/chrome.exe' -ArgumentList 'http://127.0.0.1:5173/#/allocation' -WindowStyle Normal` | Approved Chrome launch succeeded for local application review. Visual QA used actual Playwright screenshots. |
+| `git add …`, `git diff --cached --check` | Approved staging of the listed implementation/docs/tests/evidence succeeded; staged whitespace check passed. |
+| `git commit -m "Implement memory allocation, page replacement, and replay comparisons"` | Succeeded: `7542aa4`, 53 files. Details-only commit title. |
+| `git push origin main` | Approved push succeeded; requested repository `main` updated from `ca25739` to `7542aa4`. |
+| `git status --short`, `git rev-list --left-right --count HEAD...origin/main` | Clean after implementation push; divergence `0 0`. This Git evidence is recorded in a subsequent documentation-only commit. |
 
 ### Evidence and fixes
 
