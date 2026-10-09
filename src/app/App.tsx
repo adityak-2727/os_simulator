@@ -7,6 +7,8 @@ import { useCpu } from '../features/cpu/CpuContext';
 import { useMemory } from '../features/memory/MemoryContext';
 import { AllocationLab } from '../features/memory/AllocationLab';
 import { PagingLab } from '../features/memory/PagingLab';
+import { DeadlockLab } from '../features/deadlock/DeadlockLab';
+import { useDeadlock } from '../features/deadlock/DeadlockContext';
 
 const routes = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', phase: 7 },
@@ -36,11 +38,13 @@ export function App() {
   const { dispatch } = useLab();
   const { dispatch: cpuDispatch } = useCpu();
   const { dispatch: memoryDispatch } = useMemory();
+  const { dispatch: deadlockDispatch } = useDeadlock();
   const current = routes.find((item) => item.id === route);
   useEffect(() => {
     const navigate = () => {
       setRoute(getRoute());
       setMenuOpen(false);
+      deadlockDispatch({ type: 'pause-all' });
       dispatch({ type: 'replay', action: { type: 'pause' } });
       cpuDispatch({ type: 'replay', action: { type: 'pause' } });
       memoryDispatch({
@@ -56,7 +60,7 @@ export function App() {
     };
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
-  }, [dispatch, cpuDispatch, memoryDispatch]);
+  }, [dispatch, cpuDispatch, memoryDispatch, deadlockDispatch]);
   useEffect(() => {
     document.title = `${current?.label ?? (route === 'replay-preview' ? 'Replay preview' : 'Page unavailable')} · OS Lab Simulator`;
   }, [current, route]);
@@ -92,7 +96,9 @@ export function App() {
             >
               <Icon name={item.icon} />
               <span>{item.label}</span>
-              {!['cpu', 'allocation', 'paging', 'help'].includes(item.id) && (
+              {!['cpu', 'allocation', 'paging', 'deadlock', 'help'].includes(
+                item.id,
+              ) && (
                 <span
                   className="nav-phase"
                   aria-label={`Available in phase ${item.phase}`}
@@ -105,7 +111,7 @@ export function App() {
         </nav>
         <div className="rail-footer">
           <span className="phase-tag">LOCAL LAB</span>
-          <p>CPU & memory laboratories</p>
+          <p>CPU, memory & resource labs</p>
           <span className="subtle small">
             Local browser simulation
             <br />
@@ -144,6 +150,8 @@ export function App() {
             <AllocationLab />
           ) : route === 'paging' ? (
             <PagingLab />
+          ) : route === 'deadlock' ? (
+            <DeadlockLab />
           ) : route === 'replay-preview' ? (
             <PreviewLab />
           ) : route === 'help' ? (
@@ -191,9 +199,9 @@ function Unavailable({
             : 'Choose a lab from the navigation'}
         </h2>
         <p>
-          CPU scheduling, memory allocation, and page replacement are available
-          with replay. Other algorithms and experiment storage will be added in
-          their specified phases.
+          CPU scheduling, memory allocation, page replacement, and resource
+          safety are available with replay. Other algorithms and experiment
+          storage will be added in their specified phases.
         </p>
         <a className="button primary" href="#/cpu">
           Open CPU scheduling
@@ -252,7 +260,9 @@ function Dashboard() {
                     ? 'Available · four algorithms'
                     : item.id === 'allocation' || item.id === 'paging'
                       ? 'Available · three algorithms'
-                      : `Unavailable · Phase ${item.phase}`}
+                      : item.id === 'deadlock'
+                        ? 'Available · graphs & Banker'
+                        : `Unavailable · Phase ${item.phase}`}
                 </span>
               </a>
             ))}
@@ -370,6 +380,24 @@ function Help() {
           references and uses the lowest frame index for ties. Ratios use only
           processed references and remain unavailable at the initial frame.
           Allocation and paging step indices are not CPU time or milliseconds.
+        </p>
+        <h2>Resource safety model</h2>
+        <p>
+          Resource graphs model one reusable instance per resource. Request
+          arrows go from process to resource; allocation arrows go from resource
+          to owner. A directed cycle proves deadlock in this model. Use the
+          configuration tables to request, cancel, grant, and release resources
+          with the keyboard.
+        </p>
+        <p>
+          Banker derives Available and Need from Total, Allocation, and Max.
+          Safety simulates completion in Work without releasing actual
+          allocations. It restarts at the first input row after each selection.
+          Unsafe means no safe sequence, not proven deadlock. Requests commit
+          only after a safe check; otherwise the exact original state remains.
+          Continue from granted state explicitly adopts the committed allocation
+          as the next source workload. Resource trace steps are ordered
+          decisions, not simulated time.
         </p>
         <h2>Replay infrastructure example</h2>
         <p>

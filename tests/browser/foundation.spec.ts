@@ -142,13 +142,13 @@ test('keyboard, routes, scroll containment, and screenshots', async ({
   });
   if ((page.viewportSize()?.width ?? 1440) <= 768)
     await page.getByRole('button', { name: 'Open navigation' }).click();
-  await page.getByRole('link', { name: /Deadlock/ }).click();
+  await page.getByRole('link', { name: /Synchronization/ }).click();
   await expect(
     page.getByRole('heading', { name: 'This lab is not implemented yet' }),
   ).toBeVisible();
   await page.reload();
   await expect(
-    page.getByRole('heading', { name: 'Deadlock', exact: true }),
+    page.getByRole('heading', { name: 'Synchronization', exact: true }),
   ).toBeVisible();
   await page.getByRole('link', { name: 'Open CPU scheduling' }).click();
   await expect(

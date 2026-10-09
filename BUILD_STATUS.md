@@ -1,13 +1,13 @@
 # Build status
 
-Phases 1–3 are complete. The original specification pack, CPU work, and foundation preview are preserved. Phases 4–8 have not been implemented.
+Phases 1–4 are complete. The original specification pack, CPU/memory work, and foundation preview are preserved. Phases 5–8 have not been implemented.
 
 | Phase | Status | Evidence |
 | --- | --- | --- |
 | 1 Foundation | Complete | Typecheck, clean lint, 13 unit tests, 6 browser checks, production build, inspected screenshots |
 | 2 CPU scheduling | Complete | Six reference fixtures, 64 total unit tests, 21 full browser checks, 3 final production comparison checks, typecheck/lint/build, inspected desktop/tablet/phone screenshots |
 | 3 Memory and paging | Complete | All allocation/paging fixtures and intermediate frames, 106 total unit tests, 48 full browser checks at four widths, 8 production comparison checks, clean typecheck/lint/build, inspected screenshots |
-| 4 Deadlock | Not started | No application code yet |
+| 4 Deadlock | Complete | All six deadlock fixtures, 126 total unit tests, 64 regression browser checks plus four resource benchmarks, 16 final production resource checks, clean typecheck/lint/build/format, desktop/narrow visual review |
 | 5 Synchronization | Not started | No application code yet |
 | 6 Disk scheduling | Not started | No application code yet |
 | 7 Integration | Not started | No application code yet |
@@ -15,7 +15,7 @@ Phases 1–3 are complete. The original specification pack, CPU work, and founda
 
 ## Current task
 
-Memory allocation and paging handover complete. Next task when requested: Phase 4 using `prompts/PHASE_04_DEADLOCK.md`. No later phase was started.
+Resource graphs and Banker handover complete. Next task when requested: Phase 5 using `prompts/PHASE_05_SYNCHRONIZATION.md`. No later phase was started.
 
 ## Update format
 
@@ -219,3 +219,66 @@ Use `prompts/PHASE_03_MEMORY.md`, reading `docs/08_MEMORY_AND_PAGING_SPEC.md` an
 ### Next task
 
 Use `prompts/PHASE_04_DEADLOCK.md` and `docs/09_DEADLOCK_SPEC.md` with `fixtures/deadlock.json`. Build single-instance resource graphs, Banker's safety calculation, and transactional resource requests only when requested.
+
+## 2026-10-10 — Phase 4 resource graphs and Banker
+
+### What works
+
+- Single-instance reusable resource graphs use structured allocation/request arrays as the source of truth. Request arrows are process → resource; allocation arrows are resource → process. Validation rejects unknown nodes, duplicate edges, duplicate IDs within a scope, and multiple owners. Typed node identities keep equal process/resource text IDs separate.
+- Keyboard configuration supports request, cancel request, grant an available resource, release by its owner, and removal of source edges. Grant consumes the matching pending request. Valid edits clear the computed trace and stop playback; rejected ownership commands leave the source and current trace unchanged with an explanation.
+- Deterministic directed-cycle search produces ordered visit/backtrack/cycle events and immutable frames. The reference cycle is `P1 → R2 → P2 → R1 → P1`; both processes are identified as blocked. The lazy React Flow canvas highlights the full cycle, with an equivalent edge/ownership table. An acyclic graph explicitly allows pending waits and does not claim immediate availability.
+- Banker supports editable process/resource IDs, Total, Allocation, and Max, including add/remove rows and columns. Inputs enforce dimensions, nonnegative integers 0–1000, Allocation ≤ Max, column sums ≤ Total, and each Max ≤ Total. Available and Need are derived and read-only. Counts have instance units; resource events are steps, not CPU time.
+- Safety starts with Work = Available and Finish false. Each selection chooses the lowest input-index eligible unfinished process and restarts at row 0. The reference sequence is `P1, P3, P0, P2, P4`, with the specified six Work vectors. All actual matrices and Available stay unchanged during simulated completion. Work/Finish, sequence, trace table, and event inspector use the same frame.
+- Requests validate Need and availability before a tentative copy. The safety trace shows separate actual and analysis matrices. A safe decision commits atomically; a deferred/invalid request retains the exact original state. Safe, unsafe, granted, availability wait, safety wait, invalid request, and graph-deadlocked conclusions remain distinct. Unsafe does not establish current deadlock. Zero vectors receive a real safety calculation.
+- Independent request examples reset the source matrices. Source inputs remain fixed through replay. After a final grant, **Continue from granted state** explicitly copies the committed allocation into the next source workload and invalidates the current trace; this supports chained requests without silently changing an active run.
+- Context/reducers preserve independent graph and Banker drafts/cursors. Run/Pause, stepping, Reset, Replay, direct event selection, and speed controls reuse computed results. Switching modes/routes pauses playback. Matrix/request edits invalidate their own result. Typed engine errors are visible UI state. Shared status tones and help/navigation availability now include resource safety.
+- Added `artifacts/` to `.gitignore` and removed all 50 previously tracked screenshots from the Git index using `git rm -r --cached artifacts`. Local PNGs remain intact; new screenshots and existing build/test reports are ignored. Earlier Git history and specification documents are preserved.
+
+### Important changed files
+
+- Pure engines: `src/engine/deadlock/types.ts`, `validation.ts`, `graph.ts`, `banker.ts`.
+- Resource interface/state: `src/features/deadlock/DeadlockLab.tsx`, `DeadlockContext.ts`, `DeadlockProvider.tsx`, `deadlockState.ts`, `GraphEditor.tsx`, `ResourceGraph.tsx`, `BankerEditor.tsx`, `BankerView.tsx`, `format.ts`.
+- Shared integration: `src/main.tsx`, `src/app/App.tsx`, `src/components/Primitives.tsx`, `src/styles/index.css`.
+- Checks: `tests/unit/deadlock.test.ts`, `tests/unit/deadlockState.test.ts`, `tests/browser/deadlock.spec.ts`, `tests/browser/deadlock-performance.spec.ts`; the foundation unavailable-route check now uses Synchronization because Deadlock is implemented.
+- Dependency/docs/tracking: `package.json`, `package-lock.json` (React Flow `@xyflow/react` 12.12.0), `.gitignore`, `README.md`, and this status log. No fixture expected results or unrelated algorithm source were changed.
+
+### Commands actually executed
+
+| Command | Result |
+| --- | --- |
+| `node --version`, `npm --version` | v24.13.0 and 11.6.2. |
+| `npm install @xyflow/react` | Sandbox ENOTCACHED; approved retry succeeded: 13 packages added, 246 audited, zero vulnerabilities reported. |
+| `git rm -r --cached artifacts` | Approved removal of 50 generated PNGs from tracking; local files retained. |
+| `npm run typecheck` | Final passed. Initial closure-narrowing error in graph outcome corrected; all strict source/test checks pass. |
+| `npm run lint` | Final passed with no warnings/errors. |
+| `npm run test:run -- tests/unit/deadlock.test.ts` | Sandbox Vite startup failed with child-process EPERM/native-loading error; approved retry passed all 16 engine tests. |
+| `npm run test:run` | Passed: 126 tests in seven files, including 20 new engine/reducer checks. All six supplied deadlock oracles match. Independent checks cover Work/conservation, unchanged actual state, exact rejection rollback, input-order selection, zero Need/request, malformed matrices, cycle arrows, invalid owners, nested immutability, bounds, replay reuse, and input invalidation. |
+| `npm run test:e2e -- tests/browser/deadlock.spec.ts --project=desktop` | Initial 2/4 passed; a frozen clock prevented lazy graph rendering, and an overly broad P1 locator selected a hidden option. Corrected test clock/locator and unique new IDs; rerun passed all four desktop flows. |
+| `npm run test:e2e` | Passed: 64 regression checks in 1.5 minutes at 1440×900, 1024×900, 768×900, and 390×844, three workers, no retries. Includes 16 resource checks and all existing CPU/memory/foundation flows. |
+| `npm run test:e2e -- tests/browser/deadlock-performance.spec.ts` | Passed: four additional resource benchmark checks in 6.9 seconds. Added after the 64-check collection; the current full suite contains 68 checks. Sizes, event counts, browser/machine, duration, and subsequent input/navigation response recorded below. |
+| `npm run build` | Final passed: 757 modules; main JS 360.12 kB (104.40 kB gzip), main CSS 32.53 kB (7.60 kB gzip), lazy graph JS 168.60 kB (53.34 kB gzip) and CSS 15.41 kB (2.56 kB gzip). |
+| `npm run preview -- --port 4173 --strictPort` | Approved local production preview running at `http://127.0.0.1:4173/`. |
+| `npm run test:e2e -- tests/browser/deadlock.spec.ts` | Final production build passed all 16 functional checks in 14.0 seconds at all four widths, including lazy graph/CSS, arrows/cycle, keyboard release/grant, owner rejection, source validation, actual/tentative state, exact rollback, safe sequence, unsafe shortfalls, replay/edit invalidation, and empty-input recovery. |
+| `npx prettier --write …`, `npm run format:check` | Application/README formatting passed. Specification Markdown left unchanged. |
+| `git diff --check`, `git diff --cached --check` | Passed; routine Windows LF/CRLF notices only. |
+| `git ls-files artifacts`, `git check-ignore artifacts/resource-cycle-desktop.png` | No artifact files remain in the index; the generated screenshot is ignored. |
+| `Start-Process -FilePath 'C:/Program Files/Google/Chrome/Application/chrome.exe' -ArgumentList 'http://127.0.0.1:4173/#/deadlock' -WindowStyle Normal` | Approved Chrome launch succeeded to show the completed local application. Visual inspection used actual Playwright captures. |
+
+### Evidence and fixes
+
+- Inspected actual desktop resource-cycle and safe Banker screenshots, tablet request rollback, and phone graph and safe Banker captures. Configuration text now wraps within its column; tables scroll internally; selected-frame data and reasons agree. Banker actual and tentative Allocation/Need use explicit headings. Process labels use the established palette, with text IDs retained.
+- Screenshot review identified grid children expanding the configuration column beyond its panel. A zero-minimum grid track and child minimum widths fixed the clipping. Cycle request arrows cross at their midpoints; removed overlapping request SVG labels while retaining dashed arrows, the explicit legend, exact direction table, and allocation labels. Final production checks cover the fixes.
+- The initial graph test froze browser callbacks needed by lazy rendering and React Flow measurements. The corrected graph check uses live callbacks and explicit keyboard seeks to pause replay. Banker playback checks still control the clock, verify exact frames and speed, and avoid concurrent-worker timing assumptions. No expected algorithm answer was altered.
+- Local performance: Windows, Chrome 156.0.8078.4, Intel Core i7-14700HX, 28 logical processors, concurrent browser checks. Reference Banker (5×3) produced six events in 0.1–0.2 ms; reference graph (2 processes, 2 resources, 4 edges) five events in 0.1–0.2 ms. Maximum Banker (10×8, Total 1000 per resource, each allocation/Max 100, zero request) produced 13 events in 0.2–0.3 ms. Maximum acyclic graph (12 processes, 12 resources, 144 request edges) produced 49 events in 0.6–0.8 ms. Inputs and model switching remained responsive afterward. These engine samples are not cross-device guarantees or exhaustive large-graph rendering benchmarks; no Worker was justified.
+
+### Limitations and scope
+
+- Graph mode proves cycles only for reusable single-instance resources. Multiple instances belong to Banker; no general multi-instance deadlock detector is implemented. Dense graphs may need zoom and their equivalent tables.
+- Banker models declared claims and potential completion. Work is not actual resource availability or a timed execution schedule. Source inputs remain immutable until edited or explicitly continued from a grant. Request examples are independent resets.
+- Experiments remain in-memory. Saved experiments/localStorage/JSON workflows belong to Phase 7. Synchronization, disk, integration, and release work remain unimplemented. No backend, authentication, runtime AI service, database, or deployment was added.
+- Chrome at four widths is verified. Other browsers, screen-reader sessions, and the full release accessibility audit remain unverified. Browser performance checks require the development source server; production verification used the functional resource file only.
+- Sandbox dependency/child-process/Git-write restrictions were handled through approved commands. All requested Phase 4 completion gates are verified. New commit titles keep the user's details-only preference; required phase metadata remains in this status history and specification pack.
+
+### Next task
+
+Use `prompts/PHASE_05_SYNCHRONIZATION.md` with `docs/10_SYNCHRONIZATION_SPEC.md` and `fixtures/synchronization.json` when requested. Implement shared-counter races, mutexes, and semaphore producer-consumer interleavings. Phase 5 has not been started.

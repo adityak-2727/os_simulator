@@ -37,13 +37,20 @@ export function Panel({
   );
 }
 export function Status({ label }: { label: string }) {
-  const tone =
-    label === 'Completed'
-      ? 'success'
-      : label === 'Invalid'
-        ? 'error'
-        : label === 'Running'
-          ? 'active'
+  const tone = ['Completed', 'Safe', 'Granted', 'No cycle'].includes(label)
+    ? 'success'
+    : [
+          'Invalid',
+          'Invalid request',
+          'Unsafe',
+          'Deadlocked',
+          'Engine error',
+        ].includes(label)
+      ? 'error'
+      : label === 'Running'
+        ? 'active'
+        : label.startsWith('Wait for')
+          ? 'waiting'
           : '';
   return <span className={`status ${tone}`}>{label}</span>;
 }

@@ -7,6 +7,174 @@
   --color-action: #245ea8;
 }
 
+/* Resource analysis shares the laboratory replay frame and workbench. */
+.deadlock-mode-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 18px;
+  flex-wrap: wrap;
+}
+.deadlock-mode-bar [role='group'] {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.deadlock-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 10px;
+}
+.deadlock-editor > * {
+  min-width: 0;
+}
+.deadlock-editor label {
+  display: grid;
+  gap: 5px;
+  color: #526071;
+  font-size: 12px;
+}
+.deadlock-editor input,
+.deadlock-editor select {
+  width: 100%;
+  min-width: 0;
+}
+.deadlock-editor .section-divider {
+  margin: 8px 0;
+}
+.deadlock-editor .button {
+  justify-self: start;
+}
+.banker-input-table {
+  width: max-content;
+  min-width: 100%;
+}
+.banker-input-table th,
+.banker-input-table td {
+  padding: 5px;
+}
+.banker-input-table input {
+  width: 46px;
+  padding: 5px;
+  text-align: right;
+  font-family: ui-monospace, Consolas, monospace;
+}
+.banker-input-table td:first-child input {
+  width: 65px;
+  text-align: left;
+}
+.banker-input-table .button {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 3px 6px;
+}
+.deadlock-editor .table-scroll {
+  max-width: 100%;
+}
+.deadlock-editor .request-vector {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+.deadlock-workbench .canvas-body {
+  padding: 20px;
+}
+.resource-graph {
+  height: 340px;
+  min-width: 0;
+  border: 1px solid #dce2e9;
+  background: #f8f9fb;
+  border-radius: 4px;
+  margin: 12px 0;
+}
+.resource-graph .react-flow__node {
+  font-family: ui-monospace, Consolas, monospace;
+}
+.resource-graph .react-flow__controls button {
+  color: #17212f;
+}
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  color: #526071;
+  font-size: 11px;
+  line-height: 1.7;
+}
+.deadlock-workbench .rule-box {
+  margin: 14px 0;
+}
+.deadlock-workbench .rule-box p {
+  overflow-wrap: anywhere;
+}
+.deadlock-workbench .rule-box.deadlock-alert {
+  border: 1px solid #e3b7bf;
+  color: #932b32;
+  background: #fcf1f2;
+}
+.status.waiting {
+  background: #fff5de;
+  color: #82510b;
+}
+.deadlock-workbench .table-scroll {
+  margin: 10px 0;
+}
+.banker-matrices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 18px;
+}
+.banker-matrix {
+  min-width: 0;
+}
+.banker-matrix table {
+  min-width: 100%;
+}
+.banker-matrix th,
+.banker-matrix td {
+  padding: 8px;
+}
+.tentative-state {
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid #c2d1e4;
+  border-radius: 4px;
+  background: #f6f9fc;
+}
+.tentative-state .banker-matrices {
+  margin-top: 10px;
+}
+.deadlock-workbench .detail-list dd {
+  text-align: right;
+  overflow-wrap: anywhere;
+  max-width: 65%;
+}
+.deadlock-workbench .section-title {
+  flex-wrap: wrap;
+  gap: 8px;
+}
+@media (max-width: 1024px) {
+  .banker-matrices {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 768px) {
+  .deadlock-editor input,
+  .deadlock-editor select,
+  .deadlock-editor .button {
+    min-height: 40px;
+  }
+  .deadlock-workbench .canvas-body {
+    padding: 16px;
+  }
+  .resource-graph {
+    height: 300px;
+  }
+}
+
 /* Allocation and paging use the same frame-driven laboratory workbench. */
 .memory-workload-heading span {
   overflow-wrap: anywhere;

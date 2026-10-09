@@ -1,6 +1,6 @@
 # OS Lab Simulator
 
-A browser-only educational OS workbench with real CPU scheduling, contiguous memory allocation, and page replacement. Edit a workload, inspect its deterministic replay, and compare algorithms on identical inputs. No backend, account, telemetry, or runtime AI service is used.
+A browser-only educational OS workbench with real CPU scheduling, contiguous memory allocation, page replacement, resource graphs, and Banker analysis. Edit a workload, inspect its deterministic replay, and compare scheduling or memory algorithms on identical inputs. No backend, account, telemetry, or runtime AI service is used.
 
 ## Local setup
 
@@ -19,6 +19,14 @@ Open **`#/allocation`** for First Fit, Best Fit, and Worst Fit. Load Hole select
 
 Open **`#/paging`** for FIFO, LRU, and Optimal. Enter page IDs separated by commas or spaces, select a frame count, and inspect references, resident pages, and frame history. The reference example produces 10, 9, and 7 faults respectively. These results are calculated by the engines; reference fixtures are only imported by tests. Comparisons include exact tables and links to each computed trace.
 
+## Resource safety
+
+Open **`#/deadlock`** for single-instance resource graphs and **Banker’s algorithm**. Graph configuration supports keyboard operations to request, cancel, grant, and release resources; the React Flow canvas and edge/ownership tables show the same selected frame. Run the cycle example to inspect `P1 → R2 → P2 → R1 → P1`. Graph mode supports one instance per resource; multiple instances belong in Banker mode.
+
+Banker derives Available and Need from the editable Total, Allocation, and Max inputs. **Run** starts safety analysis when no trace exists, or resumes/replays the current trace. **Evaluate request** starts a new transactional trace. The reference calculation selects `P1, P3, P0, P2, P4` by restarting at input row 0 after every simulated completion. Work and Finish simulate potential completion without releasing actual resources. A grant commits at the decision frame; a rejected request retains the exact original state. The request examples reset to the original matrices independently. **Continue from granted state** explicitly adopts the committed allocation for your next request while keeping the current run’s source immutable until then.
+
+Safe, unsafe, availability wait, safety wait, invalid request, and graph-deadlocked conclusions are distinct. Unsafe does not prove current deadlock, and an acyclic graph can still contain pending requests. Resource steps represent ordered decisions, not elapsed simulation time.
+
 ## Commands
 
 | Command                | Purpose                                                                 |
@@ -34,16 +42,18 @@ Open **`#/paging`** for FIFO, LRU, and Optimal. Enter page IDs separated by comm
 | `npm run build`        | Typecheck and production build into `dist/`                             |
 | `npm run preview`      | Locally serve the production build                                      |
 
-Playwright starts its own server at port 4173 and uses installed Google Chrome (`channel: 'chrome'`). Install Chrome first if unavailable; alternatively configure Playwright's bundled Chromium and install it with `npx playwright install chromium`. Screenshots are written to `artifacts/`; failure traces are in ignored `test-results/`. Port 4173 must be available or already serving this app.
+Playwright starts its own server at port 4173 and uses installed Google Chrome (`channel: 'chrome'`). Install Chrome first if unavailable; alternatively configure Playwright's bundled Chromium and install it with `npx playwright install chromium`. Generated screenshots in `artifacts/`, failure traces in `test-results/`, and reports in `playwright-report/` are ignored by Git. Existing local screenshots are preserved. Port 4173 must be available or already serving this app. The performance checks import source engines from the development server; run functional checks alone against a production preview, for example `npm run test:e2e -- tests/browser/deadlock.spec.ts`.
 
 ## Architecture
 
 - `src/engine/cpu/`: pure validation, four schedulers, immutable snapshots, metrics, and same-input comparison; no React, DOM, timers, or storage. `src/engine/preview.ts` retains the scripted foundation preview.
 - `src/engine/memory/`: pure allocation/paging validation, immutable operation/reference snapshots, actual decision reasons, and three-algorithm comparisons.
+- `src/engine/deadlock/`: pure single-instance graph validation/editing/cycle search, matrix validation, deterministic Banker safety, and tentative requests with atomic commit or exact rollback.
 - `src/app/`: Context and reducers, hash navigation, cursor playback, and the timer adapter. The timer selects frames; it never recalculates a result.
 - `src/features/foundation/`: editable fixture, selected-frame timeline/queue/ledger, and event explanations.
 - `src/features/cpu/`: workload editing, Context/reducer state, SVG timeline, queue, process results, actual-event explanations, and lazily loaded Recharts comparison.
 - `src/features/memory/`: independent allocation/paging draft and replay states, ordered operation editing, address-labeled SVG map and ledger, reference cursor/history, event inspection, and lazy Recharts comparisons.
+- `src/features/deadlock/`: independent graph/Banker drafts, Context/reducer playback, keyboard editors, lazy React Flow canvas, actual/tentative matrices, Work/Finish traces, and actual-event explanations.
 - `src/components/`: accessible primitives and native SVG timeline with an equivalent table.
 - `src/styles/`: specification tokens and responsive workbench.
 - `tests/unit/` and `tests/browser/`: deterministic transitions, invariants, replay immutability, validation, keyboard, routes, and layout evidence.
@@ -58,8 +68,8 @@ Paging supports 1–12 frames, 1–200 references, and page IDs 0–9,999. Empty
 
 ## Build boundaries
 
-Foundation, CPU scheduling, allocation, and paging are implemented. The next task is `prompts/PHASE_04_DEADLOCK.md`: resource graphs and Banker's calculations. Later routes are honest availability screens. Save/export, versioned localStorage, JSON transfer, and integrated experiments belong to the integration milestone; React Flow arrives with resource graphs. No deployment has been performed.
+Foundation, CPU scheduling, allocation, paging, and resource safety are implemented. The next task is `prompts/PHASE_05_SYNCHRONIZATION.md`: shared-counter races, mutexes, and semaphore producer-consumer interleavings. Later routes are honest availability screens. Save/export, versioned localStorage, JSON transfer, and integrated experiments belong to the integration milestone. No deployment has been performed.
 
 The Markdown specification pack is the implementation contract. See `BUILD_STATUS.md` for commands actually run, verification evidence, limitations, and the next task.
 
-Setup was checked against the official [Vite guide](https://vite.dev/guide/), [Tailwind Vite integration](https://tailwindcss.com/docs/installation/using-vite), and [Playwright installation requirements](https://playwright.dev/docs/intro). Dependencies resolve once into the committed npm lockfile; use `npm ci` afterward.
+Setup was checked against the official [Vite guide](https://vite.dev/guide/), [Tailwind Vite integration](https://tailwindcss.com/docs/installation/using-vite), [Playwright installation requirements](https://playwright.dev/docs/intro), and [React Flow documentation](https://reactflow.dev/learn). Dependencies resolve once into the committed npm lockfile; use `npm ci` afterward.
