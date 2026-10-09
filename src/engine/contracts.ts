@@ -42,27 +42,42 @@ export interface TraceResult<E, S> {
   readonly outcome: RunOutcome;
 }
 
+export type CpuAlgorithm = 'fcfs' | 'sjf' | 'priority' | 'rr';
+export interface CpuProcessInput {
+  readonly id: ProcessId;
+  readonly arrival: number;
+  readonly burst: number;
+  readonly priority: number;
+}
 export interface CpuScenario {
   readonly kind: 'cpu';
-  readonly processes: readonly {
-    readonly id: ProcessId;
-    readonly arrival: number;
-    readonly burst: number;
-    readonly priority: number;
-  }[];
-  readonly algorithm: 'fcfs' | 'sjf' | 'priority' | 'rr';
+  readonly processes: readonly CpuProcessInput[];
+  readonly algorithm: CpuAlgorithm;
   readonly quantum: number;
   readonly contextSwitchCost: 0;
 }
-export type CpuEvent =
-  | (EventBase<'process-arrived'> & { readonly processId: ProcessId })
-  | (EventBase<'dispatch'> & {
+export type CpuEventPayload =
+  | { readonly kind: 'process-arrived'; readonly processId: ProcessId }
+  | {
+      readonly kind: 'dispatch';
       readonly processId: ProcessId;
-      readonly reason: string;
-    })
-  | (EventBase<'quantum-expired' | 'process-completed'> & {
+      readonly algorithm: CpuAlgorithm;
+      readonly candidates: readonly ProcessId[];
+    }
+  | {
+      readonly kind: 'quantum-expired';
       readonly processId: ProcessId;
-    });
+      readonly remaining: number;
+      readonly ahead: readonly ProcessId[];
+    }
+  | { readonly kind: 'process-completed'; readonly processId: ProcessId }
+  | { readonly kind: 'idle-started'; readonly until: number }
+  | { readonly kind: 'idle-ended' };
+export type CpuEvent = CpuEventPayload & {
+  readonly seq: number;
+  readonly simTime: number;
+  readonly explanationKey: string;
+};
 
 // Other modules add their own scenario/event unions at their implementation phase.
 // The shared result contract never uses arbitrary untyped payloads.

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useLab } from './LabContext';
 import { PreviewLab } from '../features/foundation/PreviewLab';
 import { Button, Icon } from '../components/Primitives';
+import { CpuLab } from '../features/cpu/CpuLab';
+import { useCpu } from '../features/cpu/CpuContext';
 
 const routes = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', phase: 7 },
@@ -29,19 +31,21 @@ export function App() {
   const [route, setRoute] = useState(getRoute);
   const [menuOpen, setMenuOpen] = useState(false);
   const { dispatch } = useLab();
+  const { dispatch: cpuDispatch } = useCpu();
   const current = routes.find((item) => item.id === route);
   useEffect(() => {
     const navigate = () => {
       setRoute(getRoute());
       setMenuOpen(false);
       dispatch({ type: 'replay', action: { type: 'pause' } });
+      cpuDispatch({ type: 'replay', action: { type: 'pause' } });
     };
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
-  }, [dispatch]);
+  }, [dispatch, cpuDispatch]);
   useEffect(() => {
-    document.title = `${current?.label ?? 'Page unavailable'} · OS Lab Simulator`;
-  }, [current]);
+    document.title = `${current?.label ?? (route === 'replay-preview' ? 'Replay preview' : 'Page unavailable')} · OS Lab Simulator`;
+  }, [current, route]);
   return (
     <div className="app-shell">
       <a
@@ -86,8 +90,8 @@ export function App() {
           ))}
         </nav>
         <div className="rail-footer">
-          <span className="phase-tag">PHASE 01</span>
-          <p>Foundation & replay</p>
+          <span className="phase-tag">LOCAL LAB</span>
+          <p>CPU scheduling & replay</p>
           <span className="subtle small">
             Local browser simulation
             <br />
@@ -109,13 +113,20 @@ export function App() {
             </Button>
             <span>
               Laboratory <span className="breadcrumb-slash">/</span>{' '}
-              <strong>{current?.label ?? 'Page unavailable'}</strong>
+              <strong>
+                {current?.label ??
+                  (route === 'replay-preview'
+                    ? 'Replay preview'
+                    : 'Page unavailable')}
+              </strong>
             </span>
           </div>
           <span className="topbar-note">Browser-based · no server</span>
         </header>
         <main id="main-content" tabIndex={-1}>
           {route === 'cpu' ? (
+            <CpuLab />
+          ) : route === 'replay-preview' ? (
             <PreviewLab />
           ) : route === 'help' ? (
             <Help />
@@ -162,12 +173,12 @@ function Unavailable({
             : 'Choose a lab from the navigation'}
         </h2>
         <p>
-          Phase 1 provides the application shell and deterministic replay
-          preview. Algorithm implementations and experiment storage will be
-          added in their specified phases.
+          The CPU scheduling lab is available with four algorithms and replay.
+          Other algorithms and experiment storage will be added in their
+          specified phases.
         </p>
         <a className="button primary" href="#/cpu">
-          Open replay preview
+          Open CPU scheduling
         </a>
       </section>
     </>
@@ -181,17 +192,17 @@ function Dashboard() {
         <div>
           <div className="eyebrow">LABORATORY / AVAILABILITY</div>
           <h1>Dashboard</h1>
-          <p>Choose a lab. Current build: Phase 1 foundation.</p>
+          <p>Choose a lab and inspect its computed execution trace.</p>
         </div>
       </div>
       <section className="panel overview">
-        <h2>Start with the replay preview</h2>
+        <h2>Start with CPU scheduling</h2>
         <p>
-          Inspect the scripted two-process trace, select an event, and compare
-          its queue, running slot, and timeline.
+          Run FCFS, non-preemptive SJF, non-preemptive Priority, or Round Robin.
+          Inspect each decision and compare algorithms on the same workload.
         </p>
         <a href="#/cpu" className="button primary">
-          Open replay preview
+          Open CPU scheduling
         </a>
         <div className="section-divider" />
         <h2>Module availability</h2>
@@ -206,7 +217,7 @@ function Dashboard() {
                 </span>
                 <span className="subtle">
                   {item.id === 'cpu'
-                    ? 'Fixture only · algorithm in Phase 2'
+                    ? 'Available · four algorithms'
                     : `Unavailable · Phase ${item.phase}`}
                 </span>
               </a>
@@ -233,11 +244,14 @@ function Help() {
         </div>
       </div>
       <article className="panel help-content">
-        <h2>Using the Phase 1 preview</h2>
+        <h2>Using the CPU lab</h2>
         <ol>
-          <li>Use the example, or edit a duration from 1 to 20 time units.</li>
           <li>
-            Run creates the scripted trace and starts playback. Pause holds the
+            Load an example or edit the process IDs, arrivals, bursts, and
+            priorities. Select an algorithm; only Round Robin uses a quantum.
+          </li>
+          <li>
+            Run computes the schedule and starts playback. Pause holds the
             selected frame.
           </li>
           <li>
@@ -290,11 +304,32 @@ function Help() {
         </dl>
         <h2>Build scope</h2>
         <p>
-          The fixture is scripted P1 then P2. It does not implement FCFS, SJF,
-          Priority, or Round Robin. Saving, JSON transfer, and comparisons
+          The CPU lab models one CPU, integer time, one positive burst per
+          process, no I/O, and zero context-switch cost. SJF and Priority are
+          non-preemptive; smaller priority numbers win. Saving and JSON transfer
           belong to later phases. The app does not inspect your operating system
           or execute submitted code.
         </p>
+        <h2>CPU metrics</h2>
+        <p>
+          CT is completion time. TAT = CT − arrival. WT = TAT − burst. RT =
+          first start − arrival. Utilization = busy time / observation time ×
+          100, including initial idle time. Throughput is completed processes
+          per time unit.
+        </p>
+        <p>
+          During replay, incomplete CT/TAT/WT values remain blank. Averages use
+          completed processes only. The comparison workspace is explicitly
+          labeled as final results.
+        </p>
+        <h2>Replay infrastructure example</h2>
+        <p>
+          The original scripted fixture remains available for demonstrating the
+          cursor without running a scheduling algorithm.
+        </p>
+        <a className="button" href="#/replay-preview">
+          Open replay preview
+        </a>
       </article>
     </>
   );

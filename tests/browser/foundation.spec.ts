@@ -8,7 +8,7 @@ test('coherent replay, input validation, and a recomputed fixture', async ({
   await page.clock.pauseAt(new Date('2026-10-09T12:00:01Z'));
   const errors: string[] = [];
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('/');
+  await page.goto('/#/replay-preview');
   await expect(
     page.getByRole('heading', { name: 'CPU scheduling', exact: true }),
   ).toBeVisible();
@@ -76,7 +76,7 @@ test('coherent replay, input validation, and a recomputed fixture', async ({
   ).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
-    path: `artifacts/phase-01-${testInfo.project.name}-invalid.png`,
+    path: `artifacts/replay-preview-${testInfo.project.name}-invalid.png`,
     fullPage: true,
   });
   await page.getByLabel('P1 duration in time units').fill('4');
@@ -104,7 +104,7 @@ test('coherent replay, input validation, and a recomputed fixture', async ({
 test('keyboard, routes, scroll containment, and screenshots', async ({
   page,
 }, testInfo) => {
-  await page.goto('/');
+  await page.goto('/#/replay-preview');
   await page.keyboard.press('Tab');
   await expect(
     page.getByRole('link', { name: 'Skip to workspace' }),
@@ -137,7 +137,7 @@ test('keyboard, routes, scroll containment, and screenshots', async ({
   }
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({
-    path: `artifacts/phase-01-${testInfo.project.name}.png`,
+    path: `artifacts/replay-preview-${testInfo.project.name}.png`,
     fullPage: true,
   });
   if (testInfo.project.name === 'narrow')
@@ -150,7 +150,7 @@ test('keyboard, routes, scroll containment, and screenshots', async ({
   await expect(
     page.getByRole('heading', { name: 'Memory allocation', exact: true }),
   ).toBeVisible();
-  await page.getByRole('link', { name: 'Open replay preview' }).click();
+  await page.getByRole('link', { name: 'Open CPU scheduling' }).click();
   await expect(
     page.getByRole('heading', { name: 'CPU scheduling', exact: true }),
   ).toBeVisible();

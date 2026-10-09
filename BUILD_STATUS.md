@@ -1,11 +1,11 @@
 # Build status
 
-Phase 1 is complete. The original specification pack is preserved. Later phases have not been implemented.
+Phases 1 and 2 are complete. The original specification pack and foundation preview are preserved. Phases 3–8 have not been implemented.
 
 | Phase | Status | Evidence |
 | --- | --- | --- |
 | 1 Foundation | Complete | Typecheck, clean lint, 13 unit tests, 6 browser checks, production build, inspected screenshots |
-| 2 CPU scheduling | Not started | No application code yet |
+| 2 CPU scheduling | Complete | Six reference fixtures, 64 total unit tests, 21 full browser checks, 3 final production comparison checks, typecheck/lint/build, inspected desktop/tablet/phone screenshots |
 | 3 Memory and paging | Not started | No application code yet |
 | 4 Deadlock | Not started | No application code yet |
 | 5 Synchronization | Not started | No application code yet |
@@ -15,7 +15,7 @@ Phase 1 is complete. The original specification pack is preserved. Later phases 
 
 ## Current task
 
-Phase 1 handover complete. Await an explicit request for Phase 2 using `prompts/PHASE_02_CPU.md`.
+CPU scheduling handover complete. Next requested task: Phase 3 using `prompts/PHASE_03_MEMORY.md`. No later phase was started.
 
 ## Update format
 
@@ -91,3 +91,63 @@ None needed for the default browser-only v1. A mandatory C or C++ lab requiremen
 ### Next task
 
 Use `prompts/PHASE_02_CPU.md`; read `docs/07_CPU_SCHEDULING_SPEC.md` and CPU reference fixtures. Implement four real schedulers and tests first, then CPU editing, timelines, queues, metrics, explanations, and comparison. The preview's scripted transitions are not a scheduler.
+
+## 2026-10-09 — Phase 2 CPU scheduling
+
+### What works
+
+- Pure FCFS, non-preemptive SJF, non-preemptive Priority, and Round Robin calculate actual intervals, ordered events, immutable replay frames, CT/TAT/WT/RT, averages, utilization, and throughput. All six `fixtures/cpu.json` cases match every expected interval and process metric; fixtures are test oracles, not runtime answers.
+- Arrival/input ordering resolves the specified ties; SJF uses original burst, smaller priority numbers win, and running non-preemptive processes finish before reselection. RR completes a finished process before same-time arrivals, admits arrivals before an unfinished process requeues, and retains quantum events even for one process. Idle observation starts at t = 0.
+- Editable workload name, IDs, arrivals, bursts, priorities, add/remove, conditional RR quantum, and reference/idle/tie examples. Descriptive validation covers blank, duplicate, noninteger, negative, empty, and out-of-range values. Inputs remain intact when invalid. Every edit stops playback and clears stale replay/comparison data.
+- The selected frame drives the scaled SVG timeline, CPU state, ready queue, process results, metrics, and inspector. Run/Pause/Replay, step backward/forward, Reset, 0.5×/1×/2×/4×, range selection, event selection, and keyboard interval inspection reuse the computed result.
+- CT/TAT/WT remain unavailable until completion; response appears after first dispatch. Partial averages explicitly use completed processes; final averages are labeled final. Every event explains its actual selection, queue transition, quantum, remaining service, or completion formula.
+- Four-algorithm comparison uses immutable copies of identical process inputs, shows Recharts bars plus exact metrics, shared workload and per-process tables, and opens each computed replay. Chart animation is disabled. Comparison/Recharts load as a separate production bundle.
+- SVG uses the declared 24 or 48 pixels per simulation time unit. Long traces have bounded windows, Earlier/Later/Follow cursor, full interval labels, and an equivalent table. A 50,000-event cap gives a typed error and guidance instead of a partial result. Snapshots share unchanged process rows and reference interval prefixes rather than copying the full timeline.
+- Default `#/cpu` now launches the real lab. Help preserves the labeled scripted preview at `#/replay-preview`. Dashboard/help describe CPU availability and formulas. Desktop, tablet, and phone layouts, keyboard navigation, visible focus, empty/invalid/ready/running/paused/completed states are implemented. Save/export remain honestly unavailable.
+
+### Important changed files
+
+- Engines: `src/engine/contracts.ts`, `src/engine/cpu/{types,validation,schedule,compare}.ts`.
+- CPU UI/state: `src/features/cpu/{cpuState,CpuContext,CpuProvider,CpuLab,ProcessEditor,CpuTimeline,CpuResults,CpuInspector,CpuComparison,presentation}` with appropriate `.ts`/`.tsx` extensions.
+- Shell/design: `src/app/App.tsx`, `src/main.tsx`, `src/styles/index.css`.
+- Tooling/docs: `package.json`, `package-lock.json`, `playwright.config.ts`, `README.md`, this status file.
+- Tests: `tests/unit/cpu.test.ts`, `tests/unit/cpuState.test.ts`, `tests/browser/cpu.spec.ts`, `tests/browser/cpu-performance.spec.ts`, foundation browser route updates.
+- Evidence: nine `artifacts/cpu-*.png` and six current `artifacts/replay-preview-*.png`. Original foundation screenshots restored; source specifications and fixtures unchanged.
+
+### Commands actually executed
+
+| Command | Result |
+| --- | --- |
+| `git status --short`, `git remote -v`, `git log -3 --oneline` | Existing foundation commits and requested GitHub remote confirmed; initial workspace clean. Preserved completed code. |
+| `npm install recharts` | Sandbox cache/network restriction; approved retry succeeded. npm reported 233 packages audited and zero vulnerabilities. |
+| `npm run typecheck` | Passed; also runs in every successful production build. |
+| `npm run lint` | Final run passed with zero errors/warnings. |
+| `npm run test:run` | Passed: 64 tests across 3 files (51 CPU engine/state tests plus 13 foundation/replay tests). Covers all fixture metrics/intervals, independent service/time invariants, ties, idle gaps, non-preemption, RR boundaries, quantum extremes, input limits, immutable repeated results, budget rejection, state invalidation, and shared-input comparison. |
+| `npm run test:e2e` | Latest full run: 21 passed in 20.8 seconds, 3 workers, installed Chrome at 1440×900, 1024×900, and 390×844. No retries. Includes controlled-clock replay, same-time queue frames, recomputation, comparison, invalid/empty inputs, conditional quantum, idle metrics, keyboard/focus, exact SVG scale, foundation regression, and engine measurements. |
+| `npm run format`, `npm run format:check` | Final formatting passed; specification Markdown excluded from formatting. |
+| `npm run build` | Final build passed, 613 modules. Main JS 287.46 kB (87.26 kB gzip), lazy comparison JS 375.00 kB (107.79 kB gzip), CSS 25.99 kB (6.36 kB gzip). Initial single 660.93 kB chunk warning resolved by lazy-loading comparison. |
+| `npm run preview -- --port 4173 --strictPort` | Sandbox native loader / `spawn EPERM` failure; approved retry served the actual production build successfully. |
+| `npm run test:e2e -- tests/browser/cpu.spec.ts -g "four-algorithm comparison"` | Final production verification: 3 passed in 3.3 seconds. Includes narrow overflow assertions with expanded per-process results, shared inputs, computed trace navigation, and lazy chart loading. |
+| `git restore --worktree artifacts/phase-01-desktop-invalid.png artifacts/phase-01-desktop.png artifacts/phase-01-narrow-invalid.png artifacts/phase-01-narrow.png artifacts/phase-01-tablet-invalid.png artifacts/phase-01-tablet.png` | Sandbox `.git/index.lock` permission failure; approved retry restored historical screenshots overwritten by the initial regression run. Regression tests now write separate replay-preview paths. |
+| `git diff --check` | Passed. Git reports normal Windows LF/CRLF conversion notices. |
+| `Invoke-WebRequest -Uri http://127.0.0.1:5173/ -UseBasicParsing` | Existing development server returned HTTP 200; current code available at `http://127.0.0.1:5173/#/cpu`. |
+| `Start-Process -FilePath 'C:/Program Files/Google/Chrome/Application/chrome.exe' -ArgumentList 'http://127.0.0.1:5173/#/cpu' -WindowStyle Hidden` | Approved local Chrome launch succeeded. Visual verification used actual Playwright screenshots; browser-control connector remains unavailable. |
+
+### Browser evidence, fixes, and measurements
+
+- Inspected CPU replay screenshots at desktop/tablet/phone, desktop and phone comparison, and phone invalid-input state. Screenshots include actual computed process results, labels, queue/inspector content, inline error preservation, and internal table scrolling.
+- Initial expanded browser run passed 15/18 and exposed the speed selector's accessible-name mismatch; explicit `aria-label="Speed"` fixed it. Screenshot review exposed short-timeline stretching that contradicted its scale label; SVG now maps each time unit to the selected pixel count, covered by an exact width assertion.
+- Full 21 checks passed before the final comparison layout refinement. Phone comparison screenshot then revealed overflow missed by the replay-only assertion. Production regression first passed 2/3 and measured the panel at 692 px inside a 366 px container; desktop `align-self: start` was overriding the phone flex stretch. Phone comparison now stretches to its container and resets grid placement. Final production checks passed 3/3, including expanded result tables and no page overflow.
+- Chrome 156.0.8078.4 on Windows, Intel Core i7-14700HX, 28 logical processors: reference RR trace (15 events) measured 0.2–0.4 ms in the latest full run. Near-budget RR (24 processes, burst 1,000, quantum 1) computed 48,024 events, busy/finish time 24,000, in 75.5–110.2 ms under concurrent browser checks. Fifty such processes were rejected before trace construction. These are local engine measurements, not cross-device performance guarantees or full UI playback benchmarks.
+
+### Limitations and scope
+
+- CPU model has one burst, no I/O, zero context-switch overhead, no priority aging, and the required four algorithms only. Dense valid RR inputs may exceed the event budget; increase quantum or reduce workload.
+- Memory/paging, resource graphs/Banker, synchronization, disk, integrated experiments, persistence, and JSON/CSV export remain unimplemented. No later phase is marked complete. No backend, credentials, telemetry, external AI service, or deployment added.
+- Chrome checked at three widths. Other browsers, screen-reader behavior, forced render-error recovery, and the final accessibility release audit remain unverified. Long-trace engine construction was measured; exhaustive long-trace UI stress testing is not claimed.
+- Sandbox restrictions required approved dependency, child-process, preview, and Git-write retries; successful retries leave no CPU completion gate blocked. Original specifications and test oracles were not changed to match implementation.
+- User requested change-focused commit messages without phase labels; new Git commit titles follow that preference while this required milestone history remains explicit.
+
+### Next task
+
+Use `prompts/PHASE_03_MEMORY.md`, reading `docs/08_MEMORY_AND_PAGING_SPEC.md` and the relevant memory/page fixtures. Implement First Fit, Best Fit, Worst Fit, FIFO, LRU, and Optimal in that milestone only when requested.

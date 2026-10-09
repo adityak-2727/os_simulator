@@ -1010,3 +1010,350 @@ dd {
     animation: none !important;
   }
 }
+
+/* CPU lab: extend the foundation workbench without changing other routes. */
+.cpu-workload-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: -4px 0 16px;
+  font-size: 12px;
+}
+.cpu-editor input#cpu-name,
+.cpu-editor select {
+  width: 100%;
+}
+.cpu-editor input#cpu-name {
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+.cpu-input-scroll {
+  margin-bottom: 10px;
+  max-height: 420px;
+}
+.process-editor-table {
+  min-width: 238px;
+  table-layout: fixed;
+  font-size: 12px;
+}
+.process-editor-table thead th {
+  padding: 8px 3px;
+  text-align: center;
+  font-size: 12px;
+}
+.process-editor-table thead th:first-child {
+  width: 51px;
+}
+.process-editor-table thead th:last-child {
+  width: 24px;
+}
+.process-editor-table tbody td {
+  padding: 5px 0;
+  text-align: left;
+  white-space: normal;
+}
+.process-input-row {
+  display: grid;
+  grid-template-columns: 51px repeat(3, minmax(0, 1fr)) 24px;
+  gap: 4px;
+  align-items: center;
+}
+.process-input-row input {
+  padding: 5px 3px;
+  font-size: 12px;
+  width: 100%;
+  border-color: #a3b1c2;
+  min-height: 34px;
+}
+.process-input-row input:first-child {
+  border-left: 3px solid var(--process);
+  font-family: ui-monospace, Consolas, monospace;
+}
+.process-input-row input[type='number'] {
+  appearance: textfield;
+}
+.process-input-row input::-webkit-inner-spin-button {
+  appearance: none;
+}
+.process-input-row input[aria-invalid='true'] {
+  border-color: #a32b32;
+}
+.remove-process {
+  font-size: 18px;
+  color: #526071;
+  background: white;
+  border: 1px solid #b1bdcb;
+  border-radius: 4px;
+  height: 34px;
+}
+.remove-process:hover {
+  color: #a32b32;
+  border-color: #a32b32;
+}
+.cpu-editor .field-error {
+  white-space: normal;
+  font-family: system-ui, sans-serif;
+}
+.cpu-editor .small {
+  margin: 10px 0 16px;
+}
+.quantum-field {
+  margin-top: 18px;
+}
+.quantum-field input {
+  max-width: 96px;
+}
+.cpu-editor .assumptions {
+  margin-top: 18px;
+}
+.cpu-workbench .playback-toolbar {
+  min-height: 67px;
+}
+.cpu-workbench .canvas-body {
+  padding: 18px;
+}
+.cpu-metric-strip {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px 0;
+}
+.cpu-metric-strip strong {
+  font-size: 23px;
+}
+.metric-scope {
+  margin-top: 12px;
+  margin-bottom: 7px;
+}
+.cpu-throughput {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.cpu-workbench .state-grid {
+  margin: 18px 0;
+  grid-template-columns: minmax(120px, 1fr) minmax(0, 1.5fr);
+}
+.cpu-results-table {
+  font-size: 13px;
+}
+.cpu-results-table th,
+.cpu-results-table td {
+  padding: 9px 7px;
+}
+.cpu-results-table abbr {
+  text-decoration: none;
+}
+.results-definition {
+  margin-top: 10px;
+  line-height: 1.7;
+}
+.cursor-control {
+  border-top: 1px solid #dce2e9;
+  margin-top: 16px;
+  padding-top: 14px;
+}
+.cursor-control label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #526071;
+  margin-bottom: 4px;
+}
+.cursor-control input {
+  width: 100%;
+  padding: 0;
+  border: 0;
+  min-height: 28px;
+  accent-color: #245ea8;
+}
+.compare-action {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+.compare-action p {
+  width: 100%;
+  text-align: right;
+}
+.timeline-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+}
+.timeline-options label {
+  color: #526071;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.timeline-options select {
+  min-height: 30px;
+  padding: 3px 6px;
+  font-size: 12px;
+}
+.timeline-window {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+.timeline-window .button {
+  min-height: 30px;
+  padding: 3px 7px;
+}
+.interval-disclosure {
+  margin-top: 0;
+}
+.interval-disclosure summary {
+  font-size: 12px;
+  color: #526071;
+  font-weight: 500;
+}
+.interval-disclosure .table-scroll {
+  margin-top: 10px;
+}
+.cpu-workbench .detail-list dd {
+  overflow-wrap: anywhere;
+  text-align: right;
+  max-width: 170px;
+}
+.comparison-panel {
+  grid-column: 2 / 4;
+  align-self: start;
+}
+.comparison-heading {
+  padding: 16px;
+  border-bottom: 1px solid #cdd3da;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.comparison-heading p {
+  margin-top: 6px;
+}
+.comparison-assumptions {
+  font-size: 13px;
+}
+.comparison-assumptions p {
+  color: #526071;
+  font-size: 12px;
+  margin-top: 7px;
+  line-height: 1.7;
+}
+.comparison-chart {
+  height: 280px;
+  min-width: 0;
+  margin: 16px 0;
+}
+.comparison-inputs {
+  margin-top: 22px;
+}
+.comparison-inputs .table-scroll {
+  margin-top: 12px;
+}
+.comparison-process-results {
+  margin: 20px 0;
+}
+.cpu-error {
+  background: #fcecef;
+  color: #a32b32;
+  padding: 12px 16px;
+  border: 1px solid #e3b7bf;
+  border-radius: 5px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+.cpu-error p {
+  font-size: 12px;
+  margin-top: 5px;
+}
+@media (max-width: 1350px) and (min-width: 769px) {
+  .comparison-panel {
+    grid-column: 2;
+  }
+}
+@media (max-width: 1024px) and (min-width: 769px) {
+  .process-editor-table {
+    min-width: 238px;
+  }
+  .cpu-workbench .state-grid {
+    grid-template-columns: 1fr;
+  }
+  .cpu-metric-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 16px;
+  }
+}
+@media (max-width: 768px) {
+  .cpu-workload-heading {
+    align-items: flex-start;
+  }
+  .cpu-workbench .playback-toolbar {
+    gap: 12px;
+  }
+  .cpu-workbench .canvas-body {
+    padding: 16px;
+  }
+  .cpu-editor input#cpu-name,
+  .process-input-row input,
+  .remove-process {
+    min-height: 44px;
+  }
+  .process-editor-table {
+    min-width: 320px;
+  }
+  .process-input-row {
+    grid-template-columns: 60px repeat(3, minmax(0, 1fr)) 38px;
+  }
+  .process-editor-table thead th:first-child {
+    width: 60px;
+  }
+  .process-editor-table thead th:last-child {
+    width: 38px;
+  }
+  .process-editor-table thead th {
+    font-size: 12px;
+  }
+  .cpu-metric-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .cpu-workbench .state-grid {
+    grid-template-columns: 1fr;
+  }
+  .timeline-options {
+    align-items: flex-start;
+  }
+  .timeline-options select,
+  .timeline-window .button {
+    min-height: 40px;
+  }
+  .cursor-control input {
+    min-height: 44px;
+  }
+  .cpu-results-table {
+    min-width: 340px;
+  }
+  .comparison-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .comparison-panel {
+    grid-column: auto;
+    align-self: stretch;
+  }
+  .cpu-workbench .detail-list dd {
+    max-width: 220px;
+  }
+}
