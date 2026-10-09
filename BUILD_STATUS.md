@@ -279,6 +279,13 @@ Use `prompts/PHASE_04_DEADLOCK.md` and `docs/09_DEADLOCK_SPEC.md` with `fixtures
 - Chrome at four widths is verified. Other browsers, screen-reader sessions, and the full release accessibility audit remain unverified. Browser performance checks require the development source server; production verification used the functional resource file only.
 - Sandbox dependency/child-process/Git-write restrictions were handled through approved commands. All requested Phase 4 completion gates are verified. New commit titles keep the user's details-only preference; required phase metadata remains in this status history and specification pack.
 
+### Git handover
+
+- Approved `git add …` staged only the listed implementation, tests, documentation, and `.gitignore`, together with the previously staged artifact tracking removals. `git diff --cached --check` passed. All 50 historical local artifact files were confirmed present; none were deleted from disk.
+- `git commit -m "Implement resource graphs and transactional Banker analysis"` succeeded: `075e76d`, 77 files including 50 artifact untracking changes. The commit title contains details only, without a phase label.
+- Approved `git push origin main` succeeded: requested repository updated from `6501430` to `075e76d`. `git status --short` was clean and `git rev-list --left-right --count HEAD...origin/main` returned `0 0` afterward.
+- This Git evidence is recorded in a subsequent documentation-only commit. The local production preview remains available at `http://127.0.0.1:4173/#/deadlock`; Chrome was launched successfully. No deployment was performed.
+
 ### Next task
 
 Use `prompts/PHASE_05_SYNCHRONIZATION.md` with `docs/10_SYNCHRONIZATION_SPEC.md` and `fixtures/synchronization.json` when requested. Implement shared-counter races, mutexes, and semaphore producer-consumer interleavings. Phase 5 has not been started.
