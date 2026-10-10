@@ -352,3 +352,10 @@ Use `prompts/PHASE_05_SYNCHRONIZATION.md` with `docs/10_SYNCHRONIZATION_SPEC.md`
 ### Next task
 
 Use `prompts/PHASE_06_DISK.md` when requested, with its required specifications and fixtures. Implement FCFS, SSTF, SCAN, and C-SCAN disk scheduling. Phase 6 has not been started.
+
+### Git handover
+
+- `git add …` staged only the listed synchronization implementation, checks, and documentation. `git diff --cached --check` passed. Generated artifacts remain ignored; no screenshot file was staged or deleted.
+- `git commit -m "Implement synchronization instructions and replayable interleavings"` succeeded: `12eec0d`, 24 files changed. The title contains implementation details only, without a phase label.
+- `git push origin main` succeeded to the requested `adityak-2727/os_simulator` repository, advancing `45c4d0f` to `12eec0d`. Afterward, `git status --short` was clean and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`.
+- This repository evidence is recorded in a subsequent documentation-only commit. The production preview remains available at http://127.0.0.1:4173/#/synchronization and was opened in Chrome. No deployment was performed.
