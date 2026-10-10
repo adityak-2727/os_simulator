@@ -499,3 +499,11 @@ Use `prompts/PHASE_07_INTEGRATION.md` when requested, with its required specific
 - Chrome is verified at four widths. Other browser engines, screen-reader sessions, the complete accessibility/release audit, deployment preparation and demo package remain Phase 8 work. No deployment or backend was introduced.
 - All Phase 7 completion gates are verified. Next prompt: `prompts/PHASE_08_RELEASE.md`. It remains locally available despite being ignored. Phase 8 has not started.
 - Local production app: http://127.0.0.1:4173/#/system. Restart with `npm run build` then `npm run preview -- --port 4173 --strictPort`, or use `npm run dev` for source development.
+
+### Git handover
+
+- `git add BUILD_STATUS.md README.md src tests` staged only the implementation, verification and handover files. `git diff --cached --check` passed. docs/, prompts/ and artifacts/ remain ignored and locally preserved; fixtures and unrelated engines are unchanged.
+- Final `npm run lint` and `npm run format:check` passed after the additional stopped-run interval assertion. Final typecheck and all 198 unit tests had also passed after that assertion. No application source changed after the clean full regression/production build.
+- `git commit -m "Implement integrated scheduling and saved experiment workflows"` succeeded as `ac5ed3f`, 29 files. The title contains details only, without a phase label.
+- `git push origin main` succeeded to the requested GitHub repository, advancing `2243e5f` to `ac5ed3f`. `git status --short` was clean and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`.
+- This Git evidence is recorded in a subsequent handover-only commit. Production preview remains running at http://127.0.0.1:4173/#/system and was opened in Chrome. Phase 8 is not started; no deployment was performed.
