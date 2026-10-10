@@ -11,7 +11,13 @@ export type ResourceId = string;
 export type ProcessState =
   'new' | 'memory-wait' | 'ready' | 'running' | 'blocked' | 'terminated';
 export type RunOutcome =
-  'completed' | 'blocked' | 'unsafe' | 'deadlocked' | 'stalled';
+  | 'completed'
+  | 'blocked'
+  | 'unsafe'
+  | 'deadlocked'
+  | 'stalled'
+  | 'awaiting-choice'
+  | 'model-error';
 
 export interface EngineError {
   readonly code: 'validation' | 'limit-exceeded';

@@ -9,6 +9,8 @@ import { AllocationLab } from '../features/memory/AllocationLab';
 import { PagingLab } from '../features/memory/PagingLab';
 import { DeadlockLab } from '../features/deadlock/DeadlockLab';
 import { useDeadlock } from '../features/deadlock/DeadlockContext';
+import { SyncLab } from '../features/synchronization/SyncLab';
+import { useSync } from '../features/synchronization/SyncContext';
 
 const routes = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', phase: 7 },
@@ -39,12 +41,14 @@ export function App() {
   const { dispatch: cpuDispatch } = useCpu();
   const { dispatch: memoryDispatch } = useMemory();
   const { dispatch: deadlockDispatch } = useDeadlock();
+  const { dispatch: syncDispatch } = useSync();
   const current = routes.find((item) => item.id === route);
   useEffect(() => {
     const navigate = () => {
       setRoute(getRoute());
       setMenuOpen(false);
       deadlockDispatch({ type: 'pause-all' });
+      syncDispatch({ type: 'replay', action: { type: 'pause' } });
       dispatch({ type: 'replay', action: { type: 'pause' } });
       cpuDispatch({ type: 'replay', action: { type: 'pause' } });
       memoryDispatch({
@@ -60,7 +64,7 @@ export function App() {
     };
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
-  }, [dispatch, cpuDispatch, memoryDispatch, deadlockDispatch]);
+  }, [dispatch, cpuDispatch, memoryDispatch, deadlockDispatch, syncDispatch]);
   useEffect(() => {
     document.title = `${current?.label ?? (route === 'replay-preview' ? 'Replay preview' : 'Page unavailable')} · OS Lab Simulator`;
   }, [current, route]);
@@ -96,9 +100,14 @@ export function App() {
             >
               <Icon name={item.icon} />
               <span>{item.label}</span>
-              {!['cpu', 'allocation', 'paging', 'deadlock', 'help'].includes(
-                item.id,
-              ) && (
+              {![
+                'cpu',
+                'allocation',
+                'paging',
+                'deadlock',
+                'synchronization',
+                'help',
+              ].includes(item.id) && (
                 <span
                   className="nav-phase"
                   aria-label={`Available in phase ${item.phase}`}
@@ -111,7 +120,7 @@ export function App() {
         </nav>
         <div className="rail-footer">
           <span className="phase-tag">LOCAL LAB</span>
-          <p>CPU, memory & resource labs</p>
+          <p>CPU, memory & concurrency labs</p>
           <span className="subtle small">
             Local browser simulation
             <br />
@@ -152,6 +161,8 @@ export function App() {
             <PagingLab />
           ) : route === 'deadlock' ? (
             <DeadlockLab />
+          ) : route === 'synchronization' ? (
+            <SyncLab />
           ) : route === 'replay-preview' ? (
             <PreviewLab />
           ) : route === 'help' ? (
@@ -262,7 +273,9 @@ function Dashboard() {
                       ? 'Available · three algorithms'
                       : item.id === 'deadlock'
                         ? 'Available · graphs & Banker'
-                        : `Unavailable · Phase ${item.phase}`}
+                        : item.id === 'synchronization'
+                          ? 'Available · instruction interleavings'
+                          : `Unavailable · Phase ${item.phase}`}
                 </span>
               </a>
             ))}
@@ -398,6 +411,25 @@ function Help() {
           Continue from granted state explicitly adopts the committed allocation
           as the next source workload. Resource trace steps are ordered
           decisions, not simulated time.
+        </p>
+        <h2>Synchronization model</h2>
+        <p>
+          Synchronization executes a typed model instruction per process choice.
+          Reads, local updates, and writes are separate, so interleavings can
+          lose updates. Mutex unlock requires ownership and hands the mutex
+          directly to the first waiter. Semaphore signal grants the first
+          waiting permit without incrementing the count; the blocked wait
+          completes once, not twice.
+        </p>
+        <p>
+          Manual choices extend recorded schedules. After rewind, selecting a
+          different process requires an explicit branch that discards future
+          choices. An exhausted schedule awaits a choice; all programs finished
+          means completed. No runnable unfinished process means stalled, without
+          claiming a proven wait cycle. Buffer reservations show permits in
+          flight; empty + full need not equal capacity between wait and signal.
+          Buffer operations require mutex m ownership. This models interleavings
+          rather than running real concurrent code.
         </p>
         <h2>Replay infrastructure example</h2>
         <p>

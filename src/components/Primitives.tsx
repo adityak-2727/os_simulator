@@ -45,11 +45,15 @@ export function Status({ label }: { label: string }) {
           'Unsafe',
           'Deadlocked',
           'Engine error',
+          'Model error',
+          'Invalid choice',
         ].includes(label)
       ? 'error'
       : label === 'Running'
         ? 'active'
-        : label.startsWith('Wait for')
+        : label.startsWith('Wait for') ||
+            label === 'Awaiting choice' ||
+            label === 'Stalled'
           ? 'waiting'
           : '';
   return <span className={`status ${tone}`}>{label}</span>;

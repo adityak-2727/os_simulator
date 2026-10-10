@@ -6,6 +6,7 @@ import { AppErrorBoundary } from './app/AppErrorBoundary';
 import { CpuProvider } from './features/cpu/CpuProvider';
 import { MemoryProvider } from './features/memory/MemoryProvider';
 import { DeadlockProvider } from './features/deadlock/DeadlockProvider';
+import { SyncProvider } from './features/synchronization/SyncProvider';
 import './styles/index.css';
 
 const root = document.getElementById('root');
@@ -16,9 +17,11 @@ createRoot(root).render(
       <CpuProvider>
         <MemoryProvider>
           <DeadlockProvider>
-            <AppErrorBoundary>
-              <App />
-            </AppErrorBoundary>
+            <SyncProvider>
+              <AppErrorBoundary>
+                <App />
+              </AppErrorBoundary>
+            </SyncProvider>
           </DeadlockProvider>
         </MemoryProvider>
       </CpuProvider>

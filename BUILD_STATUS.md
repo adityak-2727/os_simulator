@@ -1,6 +1,6 @@
 # Build status
 
-Phases 1–4 are complete. The original specification pack, CPU/memory work, and foundation preview are preserved. Phases 5–8 have not been implemented.
+Phases 1–5 are complete. The original specification pack and completed labs are preserved. Phases 6–8 have not been implemented.
 
 | Phase | Status | Evidence |
 | --- | --- | --- |
@@ -8,14 +8,14 @@ Phases 1–4 are complete. The original specification pack, CPU/memory work, and
 | 2 CPU scheduling | Complete | Six reference fixtures, 64 total unit tests, 21 full browser checks, 3 final production comparison checks, typecheck/lint/build, inspected desktop/tablet/phone screenshots |
 | 3 Memory and paging | Complete | All allocation/paging fixtures and intermediate frames, 106 total unit tests, 48 full browser checks at four widths, 8 production comparison checks, clean typecheck/lint/build, inspected screenshots |
 | 4 Deadlock | Complete | All six deadlock fixtures, 126 total unit tests, 64 regression browser checks plus four resource benchmarks, 16 final production resource checks, clean typecheck/lint/build/format, desktop/narrow visual review |
-| 5 Synchronization | Not started | No application code yet |
+| 5 Synchronization | Complete | Three synchronization fixtures and intermediate PCs, 148 total unit tests, 88 regression/benchmark browser checks, 16 production synchronization checks at four widths, clean typecheck/lint/build/format, inspected desktop/tablet/narrow screenshots |
 | 6 Disk scheduling | Not started | No application code yet |
 | 7 Integration | Not started | No application code yet |
 | 8 Release | Not started | No application code yet |
 
 ## Current task
 
-Resource graphs and Banker handover complete. Next task when requested: Phase 5 using `prompts/PHASE_05_SYNCHRONIZATION.md`. No later phase was started.
+Synchronization handover complete. Next task when requested: Phase 6 using `prompts/PHASE_06_DISK.md`. No later phase was started.
 
 ## Update format
 
@@ -289,3 +289,66 @@ Use `prompts/PHASE_04_DEADLOCK.md` and `docs/09_DEADLOCK_SPEC.md` with `fixtures
 ### Next task
 
 Use `prompts/PHASE_05_SYNCHRONIZATION.md` with `docs/10_SYNCHRONIZATION_SPEC.md` and `fixtures/synchronization.json` when requested. Implement shared-counter races, mutexes, and semaphore producer-consumer interleavings. Phase 5 has not been started.
+
+## 2026-10-10 — Phase 5 synchronization
+
+### What works
+
+- Pure typed instruction interpreter for separate shared-counter reads, local additions, shared writes, mutex lock/unlock, semaphore wait/signal, and bounded FIFO enqueue/dequeue. Inputs determine immutable source scenarios, ordered events, frozen nested replay frames, and an explicit final outcome. No React, timer, storage, DOM, or JavaScript evaluation is used in the engine.
+- Unprotected alternating increments calculate x=1; mutex-protected increments calculate x=2. Actual read provenance explains a stale write, including when a write replaces 1 with 1; protected writes do not receive a fabricated stale-read explanation. Every counter fixture frame reproduces the supplied shared value, PC, local registers, owner, and wait queue.
+- Mutexes enforce owner-only unlock and reject recursive locking. Blocking retains the pending instruction PC. Unlock directly assigns the mutex to the FIFO waiter and advances its pending lock exactly once; a new arrival cannot steal it. Counting semaphores use nonnegative available counts, FIFO waits, direct permit handoff without a count increment or second wait, and no signal ownership.
+- Producer-consumer computes actual A/B items, unique produced identities, FIFO consumed sequence, occupancy and maximum occupancy. Enqueue/dequeue require ownership of m; full/empty buffer operations are atomic model errors. In-flight empty/full reservations distinguish before-buffer and after-buffer stages until the complementary signal. Counts are explicitly available permits, not immediate buffer occupancy.
+- Scripted selection consumes the supplied choices; blocked/completed choices produce visible rejection events without executing instructions or duplicating waits. Manual invalid choices leave the trace unchanged. Matching the next recorded manual choice advances the existing trace. A different choice after rewind requires explicit branch review, states the discarded future count, and preserves earlier history. Cancel leaves the source and result intact; seeking, editing, or changing mode cancels stale review.
+- Schedule exhaustion with runnable processes is Awaiting choice, all finished is Completed, and no runnable process with unfinished waits is Stalled. Stalled does not claim an established deadlock cycle. Malformed inputs prevent execution; invalid runtime instructions create a stopped Model error frame with unchanged domain state. Empty, invalid, ready, running, paused, blocked, completed, stalled, and awaiting-choice states are represented.
+- Compact workbench shows editable typed programs, zero-based PCs and pending instructions, local/shared variables, process states, owner and FIFO wait tables, semaphore counts, actual buffer slots and consumed sequence, permit reservations, actual event explanations, and guided exercises. Existing process colors retain text identifiers. All panels use the same selected frame. Keyboard replay and manual process buttons work at desktop and narrow widths.
+- Context/reducer state keeps the source fixed during replay. Input edits invalidate and stop the result; speed/mode changes reuse it; navigating away pauses playback and preserves inputs. Manual choices explicitly update the source schedule only on append/confirmed branch. The empty-manual-schedule action is explicit.
+- Root scenario types now collect implemented labs. Shared run outcomes include awaiting-choice and model-error. Synchronization is available in navigation/dashboard/help; the foundation unavailable-route test now uses Disk scheduling. No earlier algorithm or fixture answer was changed. No dependency was added. artifacts/ remains ignored and existing screenshots remain on disk.
+
+### Important changed files
+
+- Pure engine: `src/engine/synchronization/types.ts`, `validation.ts`, `interpreter.ts`; `src/engine/scenarios.ts`, `src/engine/contracts.ts`.
+- Interface and state: `src/features/synchronization/SyncLab.tsx`, `SyncEditor.tsx`, `SyncView.tsx`, `SyncContext.ts`, `SyncProvider.tsx`, `syncState.ts`, `presets.ts`, `edit.ts`.
+- Integration: `src/main.tsx`, `src/app/App.tsx`, `src/components/Primitives.tsx`, `src/styles/index.css`.
+- Verification: `tests/unit/synchronization.test.ts`, `tests/unit/syncState.test.ts`, `tests/browser/synchronization.spec.ts`, `tests/browser/sync-performance.spec.ts`, `tests/browser/foundation.spec.ts`.
+- Handover: `README.md`, `BUILD_STATUS.md`. Specification documents and fixture oracles are preserved.
+
+### Commands actually executed
+
+| Command | Result |
+| --- | --- |
+| `npm run typecheck` | Passed. Initial unused instruction-type import removed; strict source/test types pass. |
+| `npm run lint` | Passed with no warnings/errors. Initial pure helper named useReservation was incorrectly recognized as a React hook; renamed markBufferChange. |
+| `npm run test:run -- tests/unit/synchronization.test.ts` | First affected run passed 15 engine tests; additional interleaving/provenance tests were subsequently added and verified in the full gate. |
+| `npm run test:run -- tests/unit/synchronization.test.ts tests/unit/syncState.test.ts` | Affected engine/reducer checks passed before final provenance coverage. |
+| `npm run test:run` | Passed: 148 tests in nine files, including 22 synchronization engine/reducer checks. |
+| `npm run test:e2e -- tests/browser/synchronization.spec.ts --project=desktop` | Initial concurrent run passed two flows; Chrome closed/crashed before app access in two others. No algorithm assertion failed. |
+| `npm run test:e2e -- tests/browser/synchronization.spec.ts --project=desktop --workers=1` | Rerun passed all four flows in 8.7 seconds. |
+| `npm run test:e2e -- --workers=1` | Passed all 88 checks in 2.2 minutes, no retries, at 1440×900, 1024×900, 768×900, and 390×844. Includes prior-lab regressions, 16 synchronization flows, and four synchronization benchmarks. |
+| `npm run build` | Passed: 767 modules, 9.20-second Vite build; main JS 395.33 kB (113.44 kB gzip), main CSS 35.94 kB (8.13 kB gzip), lazy graph JS 168.60 kB (53.34 kB gzip), graph CSS 15.41 kB (2.56 kB gzip). |
+| `npm run preview -- --port 4173 --strictPort` | Production preview running at http://127.0.0.1:4173/. |
+| `npm run test:e2e -- tests/browser/synchronization.spec.ts --workers=1` | Final production build passed all 16 synchronization functional checks in 23.8 seconds at all four widths. |
+| `npx prettier --write …`, `npm run format:check` | Final application/test/README formatting passed. Specification Markdown preserved. |
+| `git diff --check` | Passed; routine Windows LF/CRLF notices only. |
+| `git ls-files artifacts`, `git check-ignore artifacts/buffer-reservation-desktop.png` | No tracked artifacts; the new screenshot is ignored. |
+| `Invoke-WebRequest http://127.0.0.1:4173/` | Local production preview responded HTTP 200. |
+| `Start-Process -FilePath 'C:/Program Files/Google/Chrome/Application/chrome.exe' -ArgumentList 'http://127.0.0.1:4173/#/synchronization' -WindowStyle Normal` | Approved Chrome launch succeeded to show the completed local application. |
+
+### Evidence and corrections
+
+- Unit oracles check the three supplied synchronization fixtures, including every race/mutex intermediate PC and wait state. Independent tests cover FIFO mutex ownership transfer, multiple semaphore waiters, count-zero direct handoff, blocked/completed rejection, both producer/consumer starting orders, buffer bounds and item identity conservation, invalid ownership, arithmetic errors, dimensions/IDs/budget, nested immutability, source preservation, exhaustion/stall, and explicit branching. Exhaustive runnable interleavings produce both 1 and 2 for the unprotected program and always 2 for the protected program.
+- Reducer checks cover DSL round trips/validation, matching-choice result reuse, branch cancellation/confirmation, stale review cancellation, blocked manual rejection, empty manual schedule, speed changes, and source invalidation. Browser checks exercise keyboard choices, rewind branching, exact handoff PC/count, reservations before/after enqueue, all outcomes, playback timing, navigation pause, and input recovery. No fixture is imported by application source or performance checks.
+- Inspected actual desktop buffer-reservation capture, tablet protected-counter capture, and narrow producer-consumer capture. The three-column desktop and stacked narrow layouts show coherent code, queues, buffer, and event details; tables have contained scrolling. Browser checks assert no document-wide horizontal overflow at all four widths. Generated evidence lives locally in ignored artifacts/.
+- Local engine samples: Windows, Chrome 156.0.8078.4, Intel Core i7-14700HX, 28 logical processors. Six-choice reference calculation: 0.1–0.2 ms. Maximum 4×100-instruction input with 1,000 scheduled choices: 5.1–5.5 ms across four widths, 1,000 events, x=392, completed, including 600 explicitly rejected completed-process choices. Subsequent input editing and navigation remained responsive. These samples are not cross-device guarantees; a Worker was not justified.
+- A benchmark browser assertion initially used text content for a textarea; corrected it to assert its value. Chrome startup instability was handled by running one worker. Expected algorithm values were not altered to obtain passes.
+
+### Limitations and scope
+
+- Deterministic educational instruction model, not native-thread execution, a JavaScript race, or a timed CPU scheduler. Steps and PCs have instruction units. Stalled does not prove a wait cycle. Custom programs can omit semaphore waits; buffer ownership/capacity still apply, and explanations explicitly state when no reservation was recorded.
+- Limits are 2–4 processes, 1–100 instructions each, capacity 1–10, and 0–1,000 schedule choices, with a shared 50,000-event ceiling. Instruction editing uses a documented typed DSL, without arbitrary code evaluation. No randomized scheduler is required or added.
+- Inputs and experiments remain in-memory. Saved experiments, localStorage, JSON transfer, and integrated behavior belong to Phase 7. Disk scheduling, integration, and release remain unimplemented. No backend, authentication, runtime AI service, database, or deployment was added.
+- Chrome at four widths is verified. Other browsers, a screen-reader session, and the full release accessibility audit remain unverified. Performance checks require the development source server; production verification runs only the functional file. Initial concurrent Chrome launch failures are recorded above, with successful single-worker reruns.
+- All requested Phase 5 completion gates are verified. New commit titles retain the user's details-only preference; required phase metadata remains in this status history and specification pack.
+
+### Next task
+
+Use `prompts/PHASE_06_DISK.md` when requested, with its required specifications and fixtures. Implement FCFS, SSTF, SCAN, and C-SCAN disk scheduling. Phase 6 has not been started.

@@ -1,6 +1,6 @@
 # OS Lab Simulator
 
-A browser-only educational OS workbench with real CPU scheduling, contiguous memory allocation, page replacement, resource graphs, and Banker analysis. Edit a workload, inspect its deterministic replay, and compare scheduling or memory algorithms on identical inputs. No backend, account, telemetry, or runtime AI service is used.
+A browser-only educational OS workbench with real CPU scheduling, contiguous memory allocation, page replacement, resource graphs, Banker analysis, and synchronization interleavings. Edit a workload, inspect its deterministic replay, and compare scheduling or memory algorithms on identical inputs. No backend, account, telemetry, or runtime AI service is used.
 
 ## Local setup
 
@@ -27,6 +27,18 @@ Banker derives Available and Need from the editable Total, Allocation, and Max i
 
 Safe, unsafe, availability wait, safety wait, invalid request, and graph-deadlocked conclusions are distinct. Unsafe does not prove current deadlock, and an acyclic graph can still contain pending requests. Resource steps represent ordered decisions, not elapsed simulation time.
 
+## Synchronization
+
+Open **`#/synchronization`** for the shared-counter race, mutex-protected counter, and bounded FIFO producer-consumer presets. Each process executes one atomic model instruction per selected choice. Programs use one instruction per line, such as `read-counter r`, `add-local r 1`, `write-counter r`, `lock m`, `unlock m`, `wait empty`, `signal full`, `enqueue A`, or `dequeue item`. The instruction reference in the editor describes the syntax and limits. This interpreter does not execute arbitrary JavaScript.
+
+**Run** consumes the supplied process schedule. **Manual choices** lets you step a runnable process from the selected frame. A matching recorded choice advances through the existing trace. A different choice after rewind requires **Branch and step**, which visibly discards the future schedule; Cancel preserves it. **Start empty manual schedule** clears the schedule for a new experiment. Program edits invalidate the trace; switching selection mode or playback speed preserves it.
+
+The alternating unprotected increments calculate x=1; the protected example calculates x=2. Inspect PCs, local registers, and the source-read explanation to see the lost update. A blocked lock or wait keeps its PC until a FIFO handoff completes the instruction exactly once. Mutex unlock is owner-only; counting semaphores have no ownership. Producer-consumer shows actual FIFO contents, consumed items, and in-flight permits before and after the buffer change. Semaphore counts do not equal immediate occupancy between wait and signal.
+
+An exhausted schedule with runnable programs is **Awaiting choice**. All programs finished means **Completed**; unfinished programs with no runnable process means **Stalled**, without asserting a proven deadlock. Invalid source input prevents execution. Recursive locks, non-owner unlocks, uninitialized arithmetic, and full/empty or unowned buffer access produce explicit atomic model errors with unchanged instruction state. Scripted blocked/completed choices are visible rejected events; manual invalid choices leave the trace unchanged.
+
+The model supports 2–4 processes, 1–100 instructions per process, buffer capacity 1–10, and 0–1,000 scheduled choices. Steps and PCs are instruction positions, not elapsed CPU time. All calculations run synchronously in the pure interpreter; playback only selects immutable frames.
+
 ## Commands
 
 | Command                | Purpose                                                                 |
@@ -42,18 +54,20 @@ Safe, unsafe, availability wait, safety wait, invalid request, and graph-deadloc
 | `npm run build`        | Typecheck and production build into `dist/`                             |
 | `npm run preview`      | Locally serve the production build                                      |
 
-Playwright starts its own server at port 4173 and uses installed Google Chrome (`channel: 'chrome'`). Install Chrome first if unavailable; alternatively configure Playwright's bundled Chromium and install it with `npx playwright install chromium`. Generated screenshots in `artifacts/`, failure traces in `test-results/`, and reports in `playwright-report/` are ignored by Git. Existing local screenshots are preserved. Port 4173 must be available or already serving this app. The performance checks import source engines from the development server; run functional checks alone against a production preview, for example `npm run test:e2e -- tests/browser/deadlock.spec.ts`.
+Playwright starts its own server at port 4173 and uses installed Google Chrome (`channel: 'chrome'`). Install Chrome first if unavailable; alternatively configure Playwright's bundled Chromium and install it with `npx playwright install chromium`. Generated screenshots in `artifacts/`, failure traces in `test-results/`, and reports in `playwright-report/` are ignored by Git. Existing local screenshots are preserved. Port 4173 must be available or already serving this app. The performance checks import source engines from the development server; run functional checks alone against a production preview, for example `npm run test:e2e -- tests/browser/synchronization.spec.ts --workers=1`. A single worker can avoid concurrent Chrome startup failures on this machine.
 
 ## Architecture
 
 - `src/engine/cpu/`: pure validation, four schedulers, immutable snapshots, metrics, and same-input comparison; no React, DOM, timers, or storage. `src/engine/preview.ts` retains the scripted foundation preview.
 - `src/engine/memory/`: pure allocation/paging validation, immutable operation/reference snapshots, actual decision reasons, and three-algorithm comparisons.
 - `src/engine/deadlock/`: pure single-instance graph validation/editing/cycle search, matrix validation, deterministic Banker safety, and tentative requests with atomic commit or exact rollback.
+- `src/engine/synchronization/`: pure typed instruction interpretation, FIFO mutex/semaphore handoffs, counter-read provenance, bounded buffer and permit reservations, immutable transitions, and schedule branching. `src/engine/scenarios.ts` collects the implemented scenario types.
 - `src/app/`: Context and reducers, hash navigation, cursor playback, and the timer adapter. The timer selects frames; it never recalculates a result.
 - `src/features/foundation/`: editable fixture, selected-frame timeline/queue/ledger, and event explanations.
 - `src/features/cpu/`: workload editing, Context/reducer state, SVG timeline, queue, process results, actual-event explanations, and lazily loaded Recharts comparison.
 - `src/features/memory/`: independent allocation/paging draft and replay states, ordered operation editing, address-labeled SVG map and ledger, reference cursor/history, event inspection, and lazy Recharts comparisons.
 - `src/features/deadlock/`: independent graph/Banker drafts, Context/reducer playback, keyboard editors, lazy React Flow canvas, actual/tentative matrices, Work/Finish traces, and actual-event explanations.
+- `src/features/synchronization/`: typed program editor, scripted/manual selection, explicit branch review, Context/reducer playback, code PCs, local/shared data, ownership/wait tables, FIFO slots, and actual-event learning content.
 - `src/components/`: accessible primitives and native SVG timeline with an equivalent table.
 - `src/styles/`: specification tokens and responsive workbench.
 - `tests/unit/` and `tests/browser/`: deterministic transitions, invariants, replay immutability, validation, keyboard, routes, and layout evidence.
@@ -68,7 +82,7 @@ Paging supports 1–12 frames, 1–200 references, and page IDs 0–9,999. Empty
 
 ## Build boundaries
 
-Foundation, CPU scheduling, allocation, paging, and resource safety are implemented. The next task is `prompts/PHASE_05_SYNCHRONIZATION.md`: shared-counter races, mutexes, and semaphore producer-consumer interleavings. Later routes are honest availability screens. Save/export, versioned localStorage, JSON transfer, and integrated experiments belong to the integration milestone. No deployment has been performed.
+Foundation, CPU scheduling, allocation, paging, resource safety, and synchronization are implemented. The next task is `prompts/PHASE_06_DISK.md`: FCFS, SSTF, SCAN, and C-SCAN disk scheduling. Later routes are honest availability screens. Save/export, versioned localStorage, JSON transfer, and integrated experiments belong to the integration milestone. No deployment has been performed.
 
 The Markdown specification pack is the implementation contract. See `BUILD_STATUS.md` for commands actually run, verification evidence, limitations, and the next task.
 

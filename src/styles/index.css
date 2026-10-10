@@ -7,6 +7,245 @@
   --color-action: #245ea8;
 }
 
+/* Synchronization uses selected-frame data, code PCs, and explicit choices. */
+.sync-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.sync-editor > * {
+  min-width: 0;
+}
+.sync-editor label {
+  display: grid;
+  gap: 5px;
+  color: #526071;
+  font-size: 12px;
+}
+.sync-editor input,
+.sync-editor select,
+.sync-editor textarea {
+  width: 100%;
+  min-width: 0;
+}
+.sync-editor textarea {
+  padding: 8px;
+  border: 1px solid #9aa8ba;
+  border-radius: 4px;
+  font:
+    12px/1.7 ui-monospace,
+    Consolas,
+    monospace;
+  resize: vertical;
+}
+.sync-editor .section-divider {
+  margin: 4px 0;
+}
+.sync-editor .button {
+  justify-self: start;
+}
+.sync-input-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.sync-program-input {
+  display: grid;
+  gap: 7px;
+}
+.sync-process-tools {
+  display: flex;
+  align-items: end;
+  gap: 8px;
+}
+.sync-process-tools label {
+  flex: 1;
+}
+.sync-workbench .canvas-body {
+  padding: 20px;
+}
+.sync-workbench .section-title {
+  flex-wrap: wrap;
+}
+.sync-metrics {
+  margin: 12px 0 24px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.sync-choice-box {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dce2e9;
+  margin-bottom: 20px;
+}
+.sync-choice-box p {
+  margin: 8px 0 12px;
+}
+.sync-branch,
+.sync-warning {
+  padding: 12px;
+  border: 1px solid #d9bd86;
+  border-radius: 4px;
+  background: #fff5de;
+  color: #82510b;
+  margin: 12px 0;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.sync-branch p {
+  margin: 6px 0 10px;
+}
+.sync-notice {
+  padding: 10px 12px;
+  background: #eaf1fa;
+  border-left: 3px solid #245ea8;
+  margin-bottom: 16px;
+  color: #245ea8;
+  font-size: 12px;
+}
+.sync-programs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.sync-code {
+  min-width: 0;
+  border: 1px solid #dce2e9;
+  border-top: 3px solid;
+  border-radius: 4px;
+  padding: 12px;
+}
+.sync-code header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.sync-code > p {
+  margin: 8px 0;
+  overflow-wrap: anywhere;
+}
+.sync-code-lines {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 16px;
+  max-height: 320px;
+  overflow: auto;
+}
+.sync-code-lines li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) auto;
+  gap: 7px;
+  padding: 7px 4px;
+  font-size: 12px;
+  border-left: 2px solid transparent;
+}
+.sync-code-lines code {
+  overflow-wrap: anywhere;
+}
+.sync-code-lines li > span:first-child {
+  color: #526071;
+}
+.sync-code-lines .current {
+  background: #eaf1fa;
+  border-color: #245ea8;
+}
+.sync-code-lines .pending {
+  background: #fff5de;
+  border-color: #82510b;
+}
+.sync-code-lines .executed {
+  color: #526071;
+}
+.sync-pc-marker {
+  color: #245ea8;
+  font-size: 12px;
+  font-weight: 700;
+}
+.pending .sync-pc-marker {
+  color: #82510b;
+}
+.sync-locals {
+  display: grid;
+  gap: 5px;
+  margin-top: 8px;
+  font-size: 12px;
+}
+.sync-locals > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.sync-workbench .table-scroll {
+  margin: 12px 0;
+}
+.sync-workbench .rule-box {
+  margin: 16px 0;
+  font-size: 12px;
+  line-height: 1.7;
+  color: #526071;
+}
+.sync-buffer {
+  display: flex;
+  gap: 8px;
+  overflow: auto;
+  padding: 8px 0;
+  margin: 8px 0;
+}
+.sync-buffer > div {
+  flex: 0 0 90px;
+  display: grid;
+  gap: 6px;
+  min-height: 84px;
+  border: 1px solid #cdd3da;
+  border-radius: 4px;
+  padding: 10px;
+  background: #f8f9fb;
+}
+.sync-buffer .occupied {
+  background: #eaf1fa;
+  border-color: #91afd4;
+}
+.sync-buffer span,
+.sync-buffer small {
+  font-size: 12px;
+  color: #526071;
+}
+.sync-buffer strong {
+  font-family: ui-monospace, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+.sync-exercise {
+  font-size: 13px;
+  margin: 16px 0;
+}
+.sync-exercise p {
+  margin-top: 10px;
+  line-height: 1.7;
+}
+.sync-workbench .detail-list dd {
+  overflow-wrap: anywhere;
+  max-width: 60%;
+  text-align: right;
+}
+@media (max-width: 1024px) {
+  .sync-programs {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 768px) {
+  .sync-editor input,
+  .sync-editor select,
+  .sync-editor .button {
+    min-height: 40px;
+  }
+  .sync-workbench .canvas-body {
+    padding: 16px;
+  }
+  .sync-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* Resource analysis shares the laboratory replay frame and workbench. */
 .deadlock-mode-bar {
   display: flex;
