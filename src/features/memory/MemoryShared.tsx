@@ -1,4 +1,4 @@
-import { Button, Icon, Panel, Status } from '../../components/Primitives';
+import { Icon, Panel, Status } from '../../components/Primitives';
 import type { ReplayState } from '../../app/replay';
 import type { EngineError } from '../../engine/contracts';
 import type { ReactNode } from 'react';
@@ -42,14 +42,6 @@ export function MemoryHeader({
               ? 'Follow each operation, inspect the holes, and account for every KiB.'
               : 'Follow each reference, inspect eviction decisions, and compare replacement rules.'}
           </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button disabled title="Saved experiments are not implemented yet">
-            Save
-          </Button>
-          <Button disabled title="Export arrives with saved experiments">
-            Export
-          </Button>
         </div>
       </div>
       <div className="cpu-workload-heading memory-workload-heading">

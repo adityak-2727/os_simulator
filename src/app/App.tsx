@@ -13,6 +13,10 @@ import { SyncLab } from '../features/synchronization/SyncLab';
 import { useSync } from '../features/synchronization/SyncContext';
 import { DiskLab } from '../features/disk/DiskLab';
 import { useDisk } from '../features/disk/DiskContext';
+import { useSystem } from '../features/system/SystemContext';
+import { SystemLab, SystemView } from '../features/system/SystemLab';
+import { Experiments, ExperimentToolbar } from '../experiments/Experiments';
+import { useExperiments } from '../experiments/ExperimentContext';
 
 const routes = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', phase: 7 },
@@ -45,6 +49,7 @@ export function App() {
   const { dispatch: deadlockDispatch } = useDeadlock();
   const { dispatch: syncDispatch } = useSync();
   const { dispatch: diskDispatch } = useDisk();
+  const { dispatch: systemDispatch } = useSystem();
   const current = routes.find((item) => item.id === route);
   useEffect(() => {
     const navigate = () => {
@@ -53,6 +58,7 @@ export function App() {
       deadlockDispatch({ type: 'pause-all' });
       syncDispatch({ type: 'replay', action: { type: 'pause' } });
       diskDispatch({ type: 'replay', action: { type: 'pause' } });
+      systemDispatch({ type: 'replay', action: { type: 'pause' } });
       dispatch({ type: 'replay', action: { type: 'pause' } });
       cpuDispatch({ type: 'replay', action: { type: 'pause' } });
       memoryDispatch({
@@ -75,6 +81,7 @@ export function App() {
     deadlockDispatch,
     syncDispatch,
     diskDispatch,
+    systemDispatch,
   ]);
   useEffect(() => {
     document.title = `${current?.label ?? (route === 'replay-preview' ? 'Replay preview' : 'Page unavailable')} · OS Lab Simulator`;
@@ -119,6 +126,9 @@ export function App() {
                 'synchronization',
                 'disk',
                 'help',
+                'system',
+                'experiments',
+                'dashboard',
               ].includes(item.id) && (
                 <span
                   className="nav-phase"
@@ -165,6 +175,7 @@ export function App() {
           <span className="topbar-note">Browser-based · no server</span>
         </header>
         <main id="main-content" tabIndex={-1}>
+          <ExperimentToolbar key={route} route={route} />
           {route === 'cpu' ? (
             <CpuLab />
           ) : route === 'allocation' ? (
@@ -177,6 +188,10 @@ export function App() {
             <SyncLab />
           ) : route === 'disk' ? (
             <DiskLab />
+          ) : route === 'system' ? (
+            <SystemLab />
+          ) : route === 'experiments' ? (
+            <Experiments />
           ) : route === 'replay-preview' ? (
             <PreviewLab />
           ) : route === 'help' ? (
@@ -226,7 +241,7 @@ function Unavailable({
         <p>
           CPU scheduling, memory allocation, page replacement, resource safety,
           synchronization, and disk scheduling are available with replay.
-          Integrated experiments and storage are next.
+          Integrated runs and saved experiments are also available.
         </p>
         <a className="button primary" href="#/cpu">
           Open CPU scheduling
@@ -237,16 +252,45 @@ function Unavailable({
 }
 
 function Dashboard() {
+  const { state } = useSystem(),
+    { items } = useExperiments();
+  const frame = state.result?.frames[state.replay.cursor];
   return (
     <>
       <div className="page-heading">
         <div>
           <div className="eyebrow">LABORATORY / AVAILABILITY</div>
           <h1>Dashboard</h1>
-          <p>Choose a lab and inspect its computed execution trace.</p>
+          <p>Launch a lab or continue the selected integrated run.</p>
         </div>
       </div>
       <section className="panel overview">
+        <h2>Active integrated run</h2>
+        <p>
+          {state.draft.name} · frame {state.replay.cursor}
+        </p>
+        <a href="#/system" className="button primary">
+          Continue run
+        </a>
+        {state.result && frame ? (
+          <SystemView result={state.result} snapshot={frame.snapshot} />
+        ) : (
+          <p>Inputs changed. Open the integrated lab and run again.</p>
+        )}
+        <div className="section-divider" />
+        <h2>Saved experiments</h2>
+        <p>
+          {items.length
+            ? items
+                .slice(0, 5)
+                .map((e) => e.name)
+                .join(' · ')
+            : 'No saved experiments yet.'}
+        </p>
+        <a href="#/experiments" className="button">
+          Manage experiments
+        </a>
+        <div className="section-divider" />
         <h2>Start with CPU scheduling</h2>
         <p>
           Run FCFS, non-preemptive SJF, non-preemptive Priority, or Round Robin.
@@ -291,13 +335,16 @@ function Dashboard() {
                           ? 'Available · instruction interleavings'
                           : item.id === 'disk'
                             ? 'Available · four disk algorithms'
-                            : `Unavailable · Phase ${item.phase}`}
+                            : item.id === 'system'
+                              ? 'Available · CPU, memory & resources'
+                              : 'Available · local saving & JSON'}
                 </span>
               </a>
             ))}
         </div>
         <p className="subtle small">
-          Integrated-run summaries and saved experiments arrive in Phase 7.
+          Dashboard panels use one selected integrated frame. Paging and disk
+          remain standalone labs.
         </p>
       </section>
     </>
@@ -379,9 +426,9 @@ function Help() {
         <p>
           The CPU lab models one CPU, integer time, one positive burst per
           process, no I/O, and zero context-switch cost. SJF and Priority are
-          non-preemptive; smaller priority numbers win. Saving and JSON transfer
-          belong to later phases. The app does not inspect your operating system
-          or execute submitted code.
+          non-preemptive; smaller priority numbers win. Experiments save
+          validated source scenarios locally and support JSON transfer. The app
+          does not inspect your operating system or execute submitted code.
         </p>
         <h2>CPU metrics</h2>
         <p>
@@ -460,7 +507,40 @@ function Help() {
           zero distance. Charts use steps; metrics measure cylinders, not
           latency.
         </p>
-        <h2>Replay infrastructure example</h2>
+        <h2>Integrated waiting and admission</h2>
+        <p>
+          Ready waiting is time eligible for CPU service. Memory waiting is time
+          before first-fit admission. Resource waiting is time blocked on an
+          owned resource while retaining memory. Completed turnaround equals CPU
+          service plus these three waiting totals. Response begins at first
+          positive CPU service, after any initial zero-time operations.
+        </p>
+        <p>
+          Strict FIFO admission can cause head-of-line waiting: a smaller
+          process cannot bypass an earlier waiter. Acquire and release take zero
+          time. Release hands ownership to the resource FIFO head once. A
+          directed single-instance wait cycle proves deadlock; stalled means no
+          progress and requires an explanation.
+        </p>
+        <h2>Experiments and reproducibility</h2>
+        <p>
+          Save a named source from any lab. JSON stores inputs and engine
+          version, never a trusted computed answer. Import validates before
+          opening; opening replaces the target lab inputs after review. Storage
+          failure preserves current work and offers JSON export. CSV results are
+          explicitly final results; spreadsheet formula markers in text are
+          escaped.
+        </p>
+        <h2>Learning exercises</h2>
+        <p>
+          CPU: predict how quantum changes response before comparing.
+          Allocation: free neighboring blocks and inspect coalescing. Paging:
+          find a hit that changes LRU but not FIFO ordering. Resources: contrast
+          unsafe with a proven wait cycle. Synchronization: replay a lost
+          update, then protect the counter. Disk: distinguish endpoint travel
+          from request service. Integrated: raise reference memory from 96 to
+          128 KiB and explain which waiting category changes.
+        </p>
         <p>
           The original scripted fixture remains available for demonstrating the
           cursor without running a scheduling algorithm.

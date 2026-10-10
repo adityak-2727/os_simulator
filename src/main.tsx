@@ -8,6 +8,8 @@ import { MemoryProvider } from './features/memory/MemoryProvider';
 import { DeadlockProvider } from './features/deadlock/DeadlockProvider';
 import { SyncProvider } from './features/synchronization/SyncProvider';
 import { DiskProvider } from './features/disk/DiskProvider';
+import { SystemProvider } from './features/system/SystemProvider';
+import { ExperimentProvider } from './experiments/ExperimentProvider';
 import './styles/index.css';
 
 const root = document.getElementById('root');
@@ -20,9 +22,13 @@ createRoot(root).render(
           <DeadlockProvider>
             <SyncProvider>
               <DiskProvider>
-                <AppErrorBoundary>
-                  <App />
-                </AppErrorBoundary>
+                <SystemProvider>
+                  <ExperimentProvider>
+                    <AppErrorBoundary>
+                      <App />
+                    </AppErrorBoundary>
+                  </ExperimentProvider>
+                </SystemProvider>
               </DiskProvider>
             </SyncProvider>
           </DeadlockProvider>

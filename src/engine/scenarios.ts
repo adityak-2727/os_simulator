@@ -3,6 +3,7 @@ import type { AllocationScenario, PagingScenario } from './memory/types';
 import type { BankerScenario, GraphScenario } from './deadlock/types';
 import type { SyncScenario } from './synchronization/types';
 import type { DiskScenario } from './disk/types';
+import type { SystemScenario } from './system/types';
 export type Scenario =
   | CpuScenario
   | AllocationScenario
@@ -10,4 +11,5 @@ export type Scenario =
   | BankerScenario
   | GraphScenario
   | SyncScenario
-  | DiskScenario;
+  | DiskScenario
+  | SystemScenario;

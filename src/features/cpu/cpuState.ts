@@ -39,6 +39,7 @@ export interface CpuState {
   readonly error: EngineError | null;
 }
 export type CpuAction =
+  | { type: 'load-scenario'; scenario: CpuScenario; name: string }
   | {
       type: 'edit-process';
       key: number;
@@ -149,6 +150,22 @@ function invalidate(state: CpuState, draft: CpuDraft): CpuState {
 }
 export function cpuReducer(state: CpuState, action: CpuAction): CpuState {
   switch (action.type) {
+    case 'load-scenario':
+      return {
+        ...invalidate(state, {
+          name: action.name,
+          algorithm: action.scenario.algorithm,
+          quantum: String(action.scenario.quantum),
+          processes: action.scenario.processes.map((p, key) => ({
+            key,
+            id: p.id,
+            arrival: String(p.arrival),
+            burst: String(p.burst),
+            priority: String(p.priority),
+          })),
+        }),
+        nextKey: action.scenario.processes.length,
+      };
     case 'edit-process':
       return invalidate(state, {
         ...state.draft,

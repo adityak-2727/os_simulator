@@ -85,17 +85,6 @@ export function CpuLab() {
             workload.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Button disabled title="Saved experiments are not implemented yet">
-            Save
-          </Button>
-          <Button
-            disabled
-            title="Scenario and CSV export arrive with saved experiments"
-          >
-            Export
-          </Button>
-        </div>
       </div>
       <div className="cpu-workload-heading">
         <span className="subtle">

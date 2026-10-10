@@ -144,13 +144,13 @@ test('keyboard, routes, scroll containment, and screenshots', async ({
     await page.getByRole('button', { name: 'Open navigation' }).click();
   await page.getByRole('link', { name: /Integrated system/ }).click();
   await expect(
-    page.getByRole('heading', { name: 'This lab is not implemented yet' }),
+    page.getByRole('heading', { name: 'Integrated system', exact: true }),
   ).toBeVisible();
   await page.reload();
   await expect(
     page.getByRole('heading', { name: 'Integrated system', exact: true }),
   ).toBeVisible();
-  await page.getByRole('link', { name: 'Open CPU scheduling' }).click();
+  await page.goto('/#/cpu');
   await expect(
     page.getByRole('heading', { name: 'CPU scheduling', exact: true }),
   ).toBeVisible();

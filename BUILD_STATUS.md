@@ -1,6 +1,6 @@
 # Build status
 
-Phases 1–6 are complete. The original specification pack and completed labs are preserved. Phases 7–8 have not been implemented.
+Phases 1–7 are complete. The specification pack is preserved locally; docs/, prompts/ and artifacts/ are ignored at the user's request. Phase 8 has not been started.
 
 | Phase | Status | Evidence |
 | --- | --- | --- |
@@ -10,12 +10,12 @@ Phases 1–6 are complete. The original specification pack and completed labs ar
 | 4 Deadlock | Complete | All six deadlock fixtures, 126 total unit tests, 64 regression browser checks plus four resource benchmarks, 16 final production resource checks, clean typecheck/lint/build/format, desktop/narrow visual review |
 | 5 Synchronization | Complete | Three synchronization fixtures and intermediate PCs, 148 total unit tests, 88 regression/benchmark browser checks, 16 production synchronization checks at four widths, clean typecheck/lint/build/format, inspected desktop/tablet/narrow screenshots |
 | 6 Disk scheduling | Complete | Four exact disk fixtures; 177 total unit tests; 112 browser cases verified (111 final full-run passes plus one navigation-interrupted benchmark passing independently); 20 final production disk checks; clean typecheck/lint/build/format; inspected desktop/tablet/narrow layouts |
-| 7 Integration | Not started | No application code yet |
+| 7 Integration | Complete | Exact integrated fixture; 198 unit tests; 148 full regression browser checks; 32 production checks; validated round trips and storage failure recovery; clean typecheck/lint/build/format; desktop/tablet/narrow review |
 | 8 Release | Not started | No application code yet |
 
 ## Current task
 
-Disk scheduling handover complete. Next task when requested: Phase 7 using `prompts/PHASE_07_INTEGRATION.md`. No later phase was started.
+Integrated system and saved experiments handover complete. Next task when requested: Phase 8 using `prompts/PHASE_08_RELEASE.md`. No later phase was started.
 
 ## Update format
 
@@ -435,3 +435,67 @@ Use `prompts/PHASE_07_INTEGRATION.md` when requested, with its required specific
 - `git commit -m "Implement disk scheduling and cylinder movement replay"` succeeded: `62b9f5c`, 21 files changed. The commit title contains details only, without a phase label.
 - Approved `git push origin main` succeeded to the requested `adityak-2727/os_simulator` repository, advancing `6d7a59a` to `62b9f5c`. Afterward, `git status --short` was clean and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`.
 - This Git evidence is recorded in a subsequent documentation-only commit. The final production preview remains available at http://127.0.0.1:4173/#/disk and was opened in Chrome. No deployment was performed.
+
+## 2026-10-10 — Phase 7 integrated system and saved experiments
+
+### What works
+
+- Pure deterministic integrated RR engine with integer simulation time, first-fit contiguous admission, strict FIFO memory waiters, single-instance resource ownership/FIFO waiters, and finite cpu/acquire/release programs. Zero-time instructions complete before quantum requeue. Arrivals inside a quantum retain its remaining allowance. Completion cleanup, arrivals, wake-ups, admission and requeue follow the required precedence.
+- The integrated fixture matches every dispatch interval, completion/turnaround/response value, CPU service and all three waiting totals. P2 blocks during [2,4), P3 waits for memory during [2,6), and the ownership intervals match the oracle. Final CPU busy time is 8 t and utilization is 100%.
+- Resource handoff completes a pending acquire once. Blocked processes retain memory. Termination explicitly releases owned resources, frees memory and coalesces adjacent holes. Release by a non-owner stops with a model-error outcome. A real two-resource cycle yields a typed deadlocked outcome and an explicit wait path. Stalled has a separate no-progress explanation; it does not assert a cycle.
+- Ordered events and deeply frozen frames share interval-prefix counts instead of duplicating the complete timeline. A conservative service-event lower bound rejects clearly oversized inputs before allocating frames; the actual 50,000-event cap returns a typed error without partial success. No engine timers, React, storage, DOM or chart libraries were introduced.
+- Integrated program editor, reference/cycle/idle examples, labeled limits, descriptive validation and invalid fields, playback controls, bounded scaled native SVG CPU history, address-labeled SVG memory, equivalent ledgers, CPU/ready/memory/resource queues, PCs and per-state waiting metrics. One selected frame drives all panels, including Dashboard. Editing clears stale results and stops playback; navigation pauses the run.
+- Shared experiment actions for all six standalone labs and the integrated lab. Save validates and serializes named source scenarios; rename updates metadata, duplicate generates a new identity, delete identifies its target and requires confirmation. Module filtering uses separately versioned, validated preferences. Opening revalidates and recomputes a fresh paused trace at frame 0.
+- JSON envelope/schema/shape/domain validation for every scenario discriminator reconstructs allowed-field objects from unknown input. No deep merging, executable strings, imported HTML or trusted result payloads. Imports show name, module, version and validation before replacing current target inputs. Future schema versions, oracle packs, malformed/oversized files and cross-field errors are rejected. Module engine versions are recorded accurately; differing imported versions have an explicit recomputation note.
+- At most 30 local experiments, at most 1 MiB per JSON import, separate experiment/preferences storage keys, and quota/security/corrupt-collection recovery. Failed saves and imports preserve current work, offer JSON export and do not claim success. An unreadable/unvalidated collection is not overwritten.
+- JSON source export and separate explicitly final CSV result export, with spreadsheet formula markers and CSV quotes/newlines escaped. Integrated CSV includes all process waiting metrics, intervals and events. Other labs export engine-derived results/decisions; synchronization and disk include exact numeric transitions and movement quantities.
+- Existing same-input comparisons retained. Assumptions, actual-event explanations, guided exercises and Help glossary/model notes cover all labs; no generative chatbot was added. Paging and disk stay standalone.
+
+### Important changed files
+
+- `src/engine/system/{types,validation,schedule}.ts`, `src/engine/scenarios.ts`.
+- `src/features/system/{systemState,SystemContext,SystemProvider,SystemLab}` with appropriate TypeScript extensions.
+- `src/experiments/{format,storage,bridge,ExperimentContext,ExperimentProvider,Experiments}` with appropriate TypeScript extensions.
+- `src/app/App.tsx`, `src/main.tsx`, `src/features/cpu/{cpuState.ts,CpuLab.tsx}`, `src/features/memory/MemoryShared.tsx`, `src/styles/index.css`.
+- `tests/unit/{system,systemState,experiments}.test.ts`, `tests/browser/{system,system-performance,experiments-storage}.spec.ts`, foundation route availability check, `README.md`, this file.
+- Generated screenshots remain local under ignored artifacts/. docs/ and prompts/ remain locally available and ignored as requested. No fixture expected answer or unrelated lab engine was changed.
+
+### Commands actually executed
+
+| Command | Result |
+| --- | --- |
+| `git status --short`, specification/prompt/source reads | Initial tree clean; prerequisites 1–6 complete. Applied the locally retained Phase 7 prompt and required specs. |
+| `npm run test:run -- tests/unit/system.test.ts tests/unit/experiments.test.ts` | Initial 15 passed/one new cycle workload failed because it acquired the second resource before quantum requeue. Corrected that additional test's workload to span quanta; unchanged reference oracle. Rerun: all 16 passed. |
+| `npm run typecheck` | Final runs passed, including after the model-error interval assertion. Initial unused import removed. |
+| `npm run lint` | Final gate passed without warnings/errors. Fixed const declarations, non-component export warning and a useMemo dependency warning. |
+| `npm run test:run` | Final gate and final added assertion run both passed: 198 tests in 14 files; final command duration 1.59 seconds. |
+| `npm run format`, `npx prettier --write tests/unit/system.test.ts`, `npm run format:check` | Application/test/README formatting passed. Specification Markdown untouched. |
+| Workspace-filtered `Get-CimInstance Win32_Process …`, `Stop-Process -Id 25340` | Sandbox process read denied; one read-only approval timed out. Allowed retry confirmed the exact old workspace Vite preview command before stopping it. No unrelated process was stopped. |
+| `npm run dev -- --port 4173 --strictPort` | First attempt reported the old preview's occupied port; after confirmed restart, current source served successfully. |
+| `npm run test:e2e -- tests/browser/system.spec.ts --project=desktop --workers=1` | First attempt collected no tests because Node required a JSON import attribute. Added the attribute; rerun: 6 passed in 21.8 seconds. |
+| `npm run test:e2e -- tests/browser/system.spec.ts --workers=1` | Initial four-width functional gate: 24 passed in 1.4 minutes. |
+| `npm run test:e2e -- tests/browser/system.spec.ts tests/browser/experiments-storage.spec.ts tests/browser/system-performance.spec.ts --workers=1` | Expanded run: 31 passed, 5 failed in 2.6 minutes. Four corrupt-storage checks expected an explicit preservation statement missing from the error copy; added it. One desktop playback flow timed out waiting through navigation; no numerical assertion changed. |
+| `npm run test:e2e -- --last-failed --workers=1` | All 5 passed in 19.0 seconds after the storage-copy correction, including the navigation-interrupted desktop flow. |
+| `npm run test:e2e -- --workers=1` | Final source-frozen full regression: all 148 passed in 7.7 minutes, no retries, at 1440×900, 1024×900, 768×900 and 390×844. All standalone labs pass. |
+| `npm run build` | Passed: 788 modules; main JS 475.86 kB (134.91 kB gzip), main CSS 40.24 kB (9.03 kB gzip); lazy comparisons/React Flow retained. No large-chunk warning. |
+| `npm run preview -- --port 4173 --strictPort` | Final production build served after stopping this task's development session. Available at http://127.0.0.1:4173/. |
+| `npm run test:e2e -- tests/browser/system.spec.ts tests/browser/experiments-storage.spec.ts --workers=1` | Final production gate: all 32 passed in 1.1 minutes at four widths, no retries. Source-import benchmark deliberately excluded from production checks. |
+| `Invoke-WebRequest http://127.0.0.1:4173/`, local Chrome `Start-Process … #/system` | HTTP 200 and successful visible Chrome launch of the completed integrated application. |
+| `git diff --check`, `git ls-files docs prompts artifacts`, `git check-ignore …` | Whitespace check passed; no tracked docs/prompts/artifacts; local specs, prompts and generated captures are ignored. Routine LF/CRLF notices only. |
+
+### Evidence and corrections
+
+- Independent invariants cover every reference/replay frame: monotonic clock, memory coverage/no overlaps/coalesced free neighbors, one running process, one resource owner, FIFO queue membership, completed process cleanup and CPU-plus-wait turnaround conservation. Diverse quantum/arrival sweeps conserve CPU service and total waits. Tests cover input-order ties, no-resource/idle cases, head-of-line memory admission, same-time wake/admission/requeue, automatic cleanup, successive FIFO handoffs, self-acquire/two-resource cycles, malformed programs, non-owner release and trace limits.
+- Experiment-import.json round-trips exactly and recalculates identical CPU output. Every other scenario discriminator also round-trips and recalculates identically. Tests reject future schemas, unexpected shapes, malformed/oversized files, duplicates and Banker cross-field violations; extra keys are stripped. Quota, corrupt JSON and even the localStorage getter throwing are exercised in actual browser checks. The corrupt collection is asserted unchanged after a failed save.
+- Browser checks exercise exact integrated waiting columns and ownership at the block frame, pause/speed/reset, dashboard continuity, edited-capacity recomputation, cycle/empty/invalid recovery, save/rename/duplicate/delete, actual JSON/CSV downloads, import preview/recompute, reload persistence, filtering and saving/opening every standalone lab.
+- Inspected actual desktop blocking/final/import-review, tablet final, narrow blocking/final/import-review screenshots. Reinspected final production desktop blocking and narrow import review. Timelines and tables scroll inside labeled regions; no document-wide horizontal overflow at any tested width. Palette assignment follows process input order and repeated colors retain IDs/border treatment. Imported names are rendered as text.
+- Final full-run performance environment: Windows, Chrome 156.0.8078.4, Intel Core i7-14700HX, 28 logical processors, one worker. Small 3-process/2-instruction workload: 34 events, 12 t CPU, 2.5–2.7 ms. Maximum supported program count (20×100 CPU instructions, duration 1, quantum 1000): 4,101 events, 2,000 t CPU, all 20 complete, 78.0–82.3 ms. Excessive 20×100×1000 t work at quantum 1 rejects in 0.4–0.6 ms. Editing/navigation remain responsive after measurements. These local samples do not claim performance on every device; no Worker was justified.
+- CSV/event labels are memoized by source/result, avoiding full trace reconstruction on playback ticks. The model-error path retains service already performed in its closed CPU interval ledger. No reference expected result was altered to produce a pass.
+
+### Limitations and next task
+
+- Finite educational model, not a native OS or thread/kernel execution. Integrated v1 uses only RR, First Fit and single-instance resources, without paging/disk coupling or switch overhead.
+- Browser storage can be unavailable; current work remains exportable, but a corrupt/unreadable saved collection is intentionally preserved and locked against writes until browser storage access/data is repaired. No cloud synchronization is provided.
+- Chrome is verified at four widths. Other browser engines, screen-reader sessions, the complete accessibility/release audit, deployment preparation and demo package remain Phase 8 work. No deployment or backend was introduced.
+- All Phase 7 completion gates are verified. Next prompt: `prompts/PHASE_08_RELEASE.md`. It remains locally available despite being ignored. Phase 8 has not started.
+- Local production app: http://127.0.0.1:4173/#/system. Restart with `npm run build` then `npm run preview -- --port 4173 --strictPort`, or use `npm run dev` for source development.

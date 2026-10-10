@@ -1,6 +1,6 @@
 # OS Lab Simulator
 
-A browser-only educational OS workbench with real CPU scheduling, contiguous memory allocation, page replacement, resource graphs, Banker analysis, synchronization interleavings, and disk scheduling. Edit a workload, inspect its deterministic replay, and compare algorithms on identical inputs. No backend, account, telemetry, or runtime AI service is used.
+A browser-only educational OS workbench with CPU scheduling, contiguous allocation, paging, resource safety, synchronization, disk scheduling, and an integrated CPU-memory-resource engine. Edit a workload, inspect its deterministic replay, compare algorithms on identical inputs, and save source experiments locally. No backend, account, telemetry, or runtime AI service is used.
 
 ## Local setup
 
@@ -51,6 +51,16 @@ SCAN and C-SCAN reach the physical endpoint if opposite-side requests remain, ev
 
 ## Commands
 
+Open **`#/system`** for integrated Round Robin, first-fit memory admission and single-instance resource FIFO queues. Programs contain finite `cpu <duration>`, `acquire <resource>` and `release <resource>` instructions. Acquire/release consume zero time. Each dispatch grants a fresh quantum; arrivals inside it do not renew it. Following zero-time operations and completion cleanup precede arrivals, wake-ups, memory admission and quantum requeue. Strict FIFO memory admission can prevent a smaller later process from bypassing the head. Blocked processes retain memory.
+
+The reference calculates completion times **7, 6, 8**. P2 resource wait is **2 t**; P3 memory wait is **4 t**. CPU service, ready waiting, resource waiting and memory waiting stay separate; their sum equals completed turnaround. First positive CPU service determines response. Timeline intervals, memory addresses, ownership, queues, PCs, metrics and explanations all use the same immutable selected frame. The cycle example proves a two-resource wait cycle; invalid owner release produces a model error. Paging and disk remain independent labs. Dashboard summarizes only the active integrated frame and links to saved experiments.
+
+Use **Save experiment**, **Export JSON**, or **Export results CSV** from any real lab. **`#/experiments`** supports module filtering, rename, duplicate with a new identity, targeted delete confirmation, import review and opening. Opening revalidates and recomputes a fresh trace, paused at frame 0. CSV clearly exports final results, including the complete integrated event/interval ledger, and escapes spreadsheet formula markers in user text.
+
+Experiment JSON uses `format: os-lab-simulator`, schema version 1, save metadata, the module's engine semantic version and its source scenario. Expected-result fixture packs are not importable experiments. JSON imports are limited to 1 MiB, local collections to 30 experiments, integrated input to 20 processes/8 resources/100 instructions per process, and traces to 50,000 events. Storage uses `os-lab-simulator.experiments.v1` and a separate `os-lab-simulator.preferences.v1` key. Quota, security and corrupt-storage failures preserve active work and offer JSON export. A collection that cannot be validated is not overwritten. Existing saves can be exported from the list; an unavailable browser storage policy must be resolved in browser settings before saving.
+
+Source specifications in `docs/`, phase prompts in `prompts/`, and generated `artifacts/` are intentionally local and ignored by Git at the user's request. Numerical fixtures remain tracked as test oracles. Phase 8 release preparation is the next task; no deployment has been performed.
+
 | Command                | Purpose                                                                 |
 | ---------------------- | ----------------------------------------------------------------------- |
 | `npm run dev`          | Start local Vite development server                                     |
@@ -94,7 +104,7 @@ Paging supports 1–12 frames, 1–200 references, and page IDs 0–9,999. Empty
 
 ## Build boundaries
 
-Foundation, CPU scheduling, allocation, paging, resource safety, synchronization, and disk scheduling are implemented. The next task is `prompts/PHASE_07_INTEGRATION.md`: integrated CPU-memory-resource behavior, saved experiments, comparison, and learning workflows. Later routes are honest availability screens. Save/export, versioned localStorage, JSON transfer, and integrated experiments belong to that milestone. No deployment has been performed.
+Foundation and all six standalone labs, integrated CPU-memory-resource replay, saved experiments, comparison and learning workflows are implemented. The next task is `prompts/PHASE_08_RELEASE.md`: release correctness, usability, accessibility, documentation and demo preparation. No deployment has been performed.
 
 The Markdown specification pack is the implementation contract. See `BUILD_STATUS.md` for commands actually run, verification evidence, limitations, and the next task.
 

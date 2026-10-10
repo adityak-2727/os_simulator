@@ -2233,3 +2233,111 @@ dd {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+.experiment-toolbar {
+  padding: 12px 0;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--divider);
+}
+.experiment-toolbar form {
+  margin-top: 12px;
+  align-items: end;
+}
+.experiment-toolbar p {
+  margin-top: 8px;
+  font-size: 13px;
+}
+.system-editor {
+  display: grid;
+  gap: 12px;
+}
+.system-editor label,
+.experiments-panel label,
+.experiment-toolbar label {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 550;
+}
+.system-editor input,
+.system-editor textarea {
+  width: 100%;
+  min-width: 0;
+}
+.system-editor textarea {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  resize: vertical;
+  padding: 8px;
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+}
+.system-process {
+  min-width: 0;
+  border: 0;
+  border-top: 1px solid var(--divider);
+  padding: 12px 0 0;
+  display: grid;
+  gap: 8px;
+}
+.system-process legend {
+  padding-right: 6px;
+  font-size: 13px;
+  font-weight: 650;
+}
+.system-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+}
+.system-timeline,
+.system-memory {
+  overflow: auto;
+  margin: 12px 0;
+}
+.system-memory svg {
+  min-width: 560px;
+  display: block;
+}
+.system-queues {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin: 16px 0;
+  padding: 12px 0;
+  border-block: 1px solid var(--divider);
+}
+.system-queues p {
+  font-family: monospace;
+  margin-top: 6px;
+}
+.system-workbench .canvas-body h2 {
+  margin: 16px 0 8px;
+}
+.system-workbench .input-panel {
+  align-self: start;
+}
+.system-workbench .metric-strip {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.experiments-panel {
+  display: grid;
+  gap: 16px;
+}
+.experiments-panel input[type='file'] {
+  max-width: 100%;
+  width: 280px;
+}
+.import-review {
+  padding: 16px;
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+  display: grid;
+  gap: 12px;
+}
+.experiments-panel td .button {
+  font-size: 12px;
+}
+.system-workbench .canvas-panel {
+  min-width: 0;
+}
