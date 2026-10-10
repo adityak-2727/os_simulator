@@ -2006,3 +2006,230 @@ dd {
     max-width: 220px;
   }
 }
+
+/* Disk scheduling: cylinder-scaled paths and selected-frame movement data. */
+.disk-editor {
+  align-self: start;
+}
+.disk-editor .panel-body {
+  padding: 14px;
+}
+.disk-editor .field-label {
+  display: block;
+  margin: 14px 0 6px;
+}
+.disk-editor input,
+.disk-editor select {
+  width: 100%;
+}
+.disk-editor .field-error:empty {
+  display: none;
+}
+.disk-field-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+.disk-field-pair input {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.disk-editor .small {
+  margin: 8px 0 14px;
+}
+.disk-input-table {
+  table-layout: fixed;
+  width: 100%;
+  min-width: 250px;
+}
+.disk-input-table th,
+.disk-input-table td {
+  padding: 6px 3px;
+  vertical-align: top;
+}
+.disk-input-table th {
+  font-size: 12px;
+  white-space: normal;
+}
+.disk-input-table th:nth-child(1) {
+  width: 28%;
+}
+.disk-input-table th:nth-child(2) {
+  width: 31%;
+}
+.disk-input-table td input {
+  padding: 6px 5px;
+  min-width: 0;
+  font-size: 12px;
+}
+.disk-input-table td:nth-child(2) input {
+  text-align: right;
+}
+.disk-input-table .field-error {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.disk-row-actions {
+  display: flex;
+  gap: 2px;
+  justify-content: flex-end;
+}
+.disk-row-actions .button {
+  padding: 0;
+  min-width: 27px;
+  min-height: 36px;
+  height: 36px;
+  font-size: 16px;
+}
+.disk-example-actions {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+.disk-workbench .canvas-body {
+  padding: 18px;
+}
+.disk-workbench .section-title {
+  margin: 0 0 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.disk-metrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.disk-metrics strong {
+  font-size: 21px;
+  overflow-wrap: anywhere;
+}
+.disk-metrics span {
+  white-space: normal;
+}
+.disk-path-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0;
+}
+.disk-path-scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--divider);
+  border-radius: 4px;
+  background: white;
+}
+.disk-path-scroll svg {
+  display: block;
+  min-width: 420px;
+  width: 100%;
+  height: auto;
+}
+.disk-axis-title {
+  font-size: 15px;
+  fill: #17212f;
+  font-weight: 600;
+}
+.disk-axis-tick {
+  font-size: 14px;
+  fill: var(--muted);
+  font-family: ui-monospace, monospace;
+}
+.disk-grid-line {
+  stroke: #dce2e8;
+  stroke-width: 1;
+}
+.disk-move {
+  stroke-width: 2;
+  stroke: #275dad;
+}
+.disk-move-endpoint {
+  stroke: #8a5b12;
+}
+.disk-move-wrap {
+  stroke: #784b93;
+  stroke-dasharray: 6 4;
+  stroke-width: 2.5;
+}
+.disk-point {
+  fill: #275dad;
+  stroke: white;
+  stroke-width: 1.5;
+}
+.disk-point-endpoint {
+  fill: #8a5b12;
+}
+.disk-point-wrap {
+  fill: #784b93;
+}
+.disk-point-label {
+  fill: #17212f;
+  font-size: 14px;
+  font-family: ui-monospace, monospace;
+  paint-order: stroke;
+  stroke: white;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+}
+.disk-path-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  margin: 10px 0;
+}
+.disk-path-legend span:nth-child(1) {
+  color: #275dad;
+}
+.disk-path-legend span:nth-child(2) {
+  color: #8a5b12;
+}
+.disk-path-legend span:nth-child(3) {
+  color: #784b93;
+}
+.disk-workbench .rule-box {
+  margin: 16px 0;
+}
+.disk-workbench .rule-box p {
+  margin-top: 8px;
+}
+.disk-workbench .table-scroll {
+  max-height: 330px;
+  margin: 12px 0;
+}
+.disk-workbench .disk-editor .table-scroll {
+  max-height: 490px;
+}
+.disk-order {
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+  margin: 10px 0;
+}
+.disk-ledger-endpoint td {
+  background: #fff9ed;
+}
+.disk-ledger-wrap td {
+  background: #f5f0f8;
+}
+.disk-workbench tr[aria-current='step'] th {
+  border-left: 3px solid #245ea8;
+}
+.disk-workbench .detail-list dd {
+  overflow-wrap: anywhere;
+}
+@media (min-width: 769px) and (max-width: 1350px) {
+  .disk-editor {
+    grid-row: span 2;
+  }
+}
+@media (max-width: 768px) {
+  .disk-row-actions .button {
+    min-width: 32px;
+    min-height: 44px;
+    height: 44px;
+  }
+  .disk-workbench .canvas-body {
+    padding: 14px;
+  }
+  .disk-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

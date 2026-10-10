@@ -1,6 +1,6 @@
 # OS Lab Simulator
 
-A browser-only educational OS workbench with real CPU scheduling, contiguous memory allocation, page replacement, resource graphs, Banker analysis, and synchronization interleavings. Edit a workload, inspect its deterministic replay, and compare scheduling or memory algorithms on identical inputs. No backend, account, telemetry, or runtime AI service is used.
+A browser-only educational OS workbench with real CPU scheduling, contiguous memory allocation, page replacement, resource graphs, Banker analysis, synchronization interleavings, and disk scheduling. Edit a workload, inspect its deterministic replay, and compare algorithms on identical inputs. No backend, account, telemetry, or runtime AI service is used.
 
 ## Local setup
 
@@ -39,6 +39,16 @@ An exhausted schedule with runnable programs is **Awaiting choice**. All program
 
 The model supports 2–4 processes, 1–100 instructions per process, buffer capacity 1–10, and 0–1,000 scheduled choices. Steps and PCs are instruction positions, not elapsed CPU time. All calculations run synchronously in the pure interpreter; playback only selects immutable frames.
 
+## Disk scheduling
+
+Open **`#/disk`** for FCFS, SSTF, SCAN, and C-SCAN over a static batch. Edit the initial head, inclusive range `0..maxCylinder`, sweep direction, request IDs, cylinders, and input order. Add/remove and earlier/later controls preserve request identity. Duplicate cylinder values are valid separate requests; request IDs are unique. Inputs support 1–100 requests and maximum cylinder 1–100,000. Empty input asks for a request and disables execution.
+
+The native SVG path uses a uniform cylinder axis and a **step** axis. Only processed moves are drawn. Blue service moves consume one request ID, ochre endpoint decisions consume none, and dashed violet wraps consume none. Long paths use 12-move windows with Earlier/Later/Follow cursor controls and a keyboard-selectable equivalent ledger. Long request labels shorten in the plot with full IDs in tooltips and tables. Head position, pending/served rows, service order, movement metrics, and event explanation share one selected replay frame.
+
+SCAN and C-SCAN reach the physical endpoint if opposite-side requests remain, even if the first direction has no requests. C-SCAN counts the entire wrap distance and performs no service along the wrap. An already-reached endpoint decision is visible with zero distance. All algorithms stop after the last service. SSTF ties use smaller cylinder, then input order; sweeps serve initial-head requests first and preserve duplicate order. FCFS preserves input order even when a later request is already at the head.
+
+**Compare algorithms** calculates four final results from identical inputs: the reference batch produces **640, 236, 331, and 382 cylinders**. The numeric table includes average cylinders per request, endpoint travel, and wrap travel; Trace opens each computed replay. These values come from engines, not bundled fixture answers. Replay metrics are labeled so far; the average divides movement so far, including overhead, by requests served and is unavailable before the first service. Movement is not latency; arrivals, rotational/transfer costs, caching, and SSD behavior are outside the model.
+
 ## Commands
 
 | Command                | Purpose                                                                 |
@@ -62,12 +72,14 @@ Playwright starts its own server at port 4173 and uses installed Google Chrome (
 - `src/engine/memory/`: pure allocation/paging validation, immutable operation/reference snapshots, actual decision reasons, and three-algorithm comparisons.
 - `src/engine/deadlock/`: pure single-instance graph validation/editing/cycle search, matrix validation, deterministic Banker safety, and tentative requests with atomic commit or exact rollback.
 - `src/engine/synchronization/`: pure typed instruction interpretation, FIFO mutex/semaphore handoffs, counter-read provenance, bounded buffer and permit reservations, immutable transitions, and schedule branching. `src/engine/scenarios.ts` collects the implemented scenario types.
+- `src/engine/disk/`: pure disk validation, static-batch scheduling, typed service/endpoint/wrap events, immutable snapshots, movement metrics, and same-input comparison.
 - `src/app/`: Context and reducers, hash navigation, cursor playback, and the timer adapter. The timer selects frames; it never recalculates a result.
 - `src/features/foundation/`: editable fixture, selected-frame timeline/queue/ledger, and event explanations.
 - `src/features/cpu/`: workload editing, Context/reducer state, SVG timeline, queue, process results, actual-event explanations, and lazily loaded Recharts comparison.
 - `src/features/memory/`: independent allocation/paging draft and replay states, ordered operation editing, address-labeled SVG map and ledger, reference cursor/history, event inspection, and lazy Recharts comparisons.
 - `src/features/deadlock/`: independent graph/Banker drafts, Context/reducer playback, keyboard editors, lazy React Flow canvas, actual/tentative matrices, Work/Finish traces, and actual-event explanations.
 - `src/features/synchronization/`: typed program editor, scripted/manual selection, explicit branch review, Context/reducer playback, code PCs, local/shared data, ownership/wait tables, FIFO slots, and actual-event learning content.
+- `src/features/disk/`: request editor, Context/reducer playback, cylinder-scaled windowed SVG path, equivalent movement ledger, pending/service rows, actual decision explanations, and lazy Recharts comparison.
 - `src/components/`: accessible primitives and native SVG timeline with an equivalent table.
 - `src/styles/`: specification tokens and responsive workbench.
 - `tests/unit/` and `tests/browser/`: deterministic transitions, invariants, replay immutability, validation, keyboard, routes, and layout evidence.
@@ -82,7 +94,7 @@ Paging supports 1–12 frames, 1–200 references, and page IDs 0–9,999. Empty
 
 ## Build boundaries
 
-Foundation, CPU scheduling, allocation, paging, resource safety, and synchronization are implemented. The next task is `prompts/PHASE_06_DISK.md`: FCFS, SSTF, SCAN, and C-SCAN disk scheduling. Later routes are honest availability screens. Save/export, versioned localStorage, JSON transfer, and integrated experiments belong to the integration milestone. No deployment has been performed.
+Foundation, CPU scheduling, allocation, paging, resource safety, synchronization, and disk scheduling are implemented. The next task is `prompts/PHASE_07_INTEGRATION.md`: integrated CPU-memory-resource behavior, saved experiments, comparison, and learning workflows. Later routes are honest availability screens. Save/export, versioned localStorage, JSON transfer, and integrated experiments belong to that milestone. No deployment has been performed.
 
 The Markdown specification pack is the implementation contract. See `BUILD_STATUS.md` for commands actually run, verification evidence, limitations, and the next task.
 

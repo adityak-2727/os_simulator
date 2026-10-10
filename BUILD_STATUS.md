@@ -1,6 +1,6 @@
 # Build status
 
-Phases 1–5 are complete. The original specification pack and completed labs are preserved. Phases 6–8 have not been implemented.
+Phases 1–6 are complete. The original specification pack and completed labs are preserved. Phases 7–8 have not been implemented.
 
 | Phase | Status | Evidence |
 | --- | --- | --- |
@@ -9,13 +9,13 @@ Phases 1–5 are complete. The original specification pack and completed labs ar
 | 3 Memory and paging | Complete | All allocation/paging fixtures and intermediate frames, 106 total unit tests, 48 full browser checks at four widths, 8 production comparison checks, clean typecheck/lint/build, inspected screenshots |
 | 4 Deadlock | Complete | All six deadlock fixtures, 126 total unit tests, 64 regression browser checks plus four resource benchmarks, 16 final production resource checks, clean typecheck/lint/build/format, desktop/narrow visual review |
 | 5 Synchronization | Complete | Three synchronization fixtures and intermediate PCs, 148 total unit tests, 88 regression/benchmark browser checks, 16 production synchronization checks at four widths, clean typecheck/lint/build/format, inspected desktop/tablet/narrow screenshots |
-| 6 Disk scheduling | Not started | No application code yet |
+| 6 Disk scheduling | Complete | Four exact disk fixtures; 177 total unit tests; 112 browser cases verified (111 final full-run passes plus one navigation-interrupted benchmark passing independently); 20 final production disk checks; clean typecheck/lint/build/format; inspected desktop/tablet/narrow layouts |
 | 7 Integration | Not started | No application code yet |
 | 8 Release | Not started | No application code yet |
 
 ## Current task
 
-Synchronization handover complete. Next task when requested: Phase 6 using `prompts/PHASE_06_DISK.md`. No later phase was started.
+Disk scheduling handover complete. Next task when requested: Phase 7 using `prompts/PHASE_07_INTEGRATION.md`. No later phase was started.
 
 ## Update format
 
@@ -359,3 +359,72 @@ Use `prompts/PHASE_06_DISK.md` when requested, with its required specifications 
 - `git commit -m "Implement synchronization instructions and replayable interleavings"` succeeded: `12eec0d`, 24 files changed. The title contains implementation details only, without a phase label.
 - `git push origin main` succeeded to the requested `adityak-2727/os_simulator` repository, advancing `45c4d0f` to `12eec0d`. Afterward, `git status --short` was clean and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`.
 - This repository evidence is recorded in a subsequent documentation-only commit. The production preview remains available at http://127.0.0.1:4173/#/synchronization and was opened in Chrome. No deployment was performed.
+
+## 2026-10-10 — Phase 6 disk scheduling
+
+### What works
+
+- Pure static-batch FCFS, SSTF, SCAN, and C-SCAN engines with readonly scenario, request, event, move, snapshot, and result contracts. Every service has a unique request ID; duplicate cylinders are valid. Sources are copied/frozen, ordered events and nested frames are immutable, and engine code has no React, DOM, timer, storage, or chart dependency.
+- FCFS keeps input order, including later requests already at the head. SSTF chooses minimum distance, then smaller cylinder, then input order. Sweep algorithms serve initial-head requests first and preserve input order among duplicates. Both directions are implemented.
+- SCAN reaches the physical endpoint before reversing if opposite-side requests remain. C-SCAN reaches that endpoint and wraps to the opposite endpoint without service during the wrap, counting the whole wrap distance. The initial-direction endpoint is reached even when no request lies on that side. All algorithms stop after the last service.
+- Typed service, endpoint, and wrap events include from/to/distance, served ID or null, direction before/after, and the actual decision reason. SSTF records ranked pending candidates and distances at the chosen event. A zero-distance service still consumes one request. If an endpoint is already reached and opposite-side work remains, a distinct zero-distance endpoint decision records the reversal/wrap preparation; it consumes no request. This explicitly exposes the decision without adding fictitious movement.
+- Immutable selected-frame metrics include head, total movement, service order, pending IDs, endpoint/wrap distances, and average movement per served request. Average so far includes all processed overhead and is unavailable before the first service. Results contain the exact full movement ledger and head path. Trace budgets include endpoint/wrap events and return typed errors without partial results.
+- Compact request editor supports IDs/cylinders, add/remove, stable row identity, keyboard earlier/later ordering, range/head/direction controls, named batches, reference and boundary examples, inline descriptive errors, and documented limits. Inputs require 1–100 requests, max cylinder 1–100,000, and all positions inside 0..max inclusive. Empty input is an explicit recovery state with no run, following the product limits; the engine returns a typed validation error rather than inventing an empty completed workload.
+- Native SVG uses a proportional cylinder axis and a step axis, with blue service lines, ochre endpoint lines, and dashed violet wraps. Only processed moves are drawn. Twelve-move windows support Earlier/Later/Follow cursor and an exact keyboard-selectable equivalent ledger. Long IDs shorten visually with full tooltips and table values. The head, path, service order, pending/served rows, metrics, and event inspector all use the same selected frame.
+- Same-input comparison computes four engine results and lazily loads Recharts. Exact tables show total cylinders, average cylinders/request, endpoint travel, wrap travel, and links to each computed trace. The reference calculates 640, 236, 331, and 382. Explanations and comparisons state the endpoint/wrap convention; no invented I/O latency or universally best algorithm is presented.
+- Context/reducer playback reuses computed results for pause, stepping, reset, replay, and speed changes. Input edits clear both stale replay/comparison and stop playback. Navigation pauses and preserves inputs/results. Disk is available in navigation/dashboard/help; the foundation unavailable-route check now uses Integrated system. The root Scenario union includes disk. Original engines and fixture answers are unchanged. No dependency was added; artifacts/ remains ignored.
+
+### Important changed files
+
+- Pure engines: `src/engine/disk/types.ts`, `validation.ts`, `schedule.ts`; `src/engine/scenarios.ts`.
+- Interface/state: `src/features/disk/DiskLab.tsx`, `DiskEditor.tsx`, `DiskPath.tsx`, `DiskComparison.tsx`, `DiskContext.ts`, `DiskProvider.tsx`, `diskState.ts`.
+- Integration: `src/main.tsx`, `src/app/App.tsx`, `src/styles/index.css`.
+- Checks: `tests/unit/disk.test.ts`, `tests/unit/diskState.test.ts`, `tests/browser/disk.spec.ts`, `tests/browser/disk-performance.spec.ts`, `tests/browser/foundation.spec.ts`.
+- Documentation: `README.md`, `BUILD_STATUS.md`. Specification documents and fixture oracles are preserved.
+
+### Commands actually executed
+
+| Command | Result |
+| --- | --- |
+| `npm run typecheck` | Passed; strict application/test types. |
+| `npm run lint` | Passed with no warnings/errors. |
+| `npm run test:run -- tests/unit/disk.test.ts tests/unit/diskState.test.ts` | Passed: 29 engine/reducer tests in two files. |
+| `npm run test:run` | Passed: 177 tests in 11 files, including all 29 new disk checks. |
+| `npm run test:e2e -- tests/browser/disk.spec.ts tests/browser/disk-performance.spec.ts --project=desktop --workers=1` | Initial attempt reached the previous production preview on 4173, so current disk UI/source imports were unavailable; stopped that run after identifying the stale server. Verified and stopped only this workspace's old Vite preview, then started current source. Rerun passed all six checks in 10.2 seconds. |
+| `npm run dev -- --port 4173 --strictPort` | Current source server started successfully for functional/source-engine browser checks. |
+| `npm run test:e2e -- --workers=1` | First full run: 111 passed/one existing desktop CPU check interrupted by a source-copy edit and Vite reload. Second full run: 111 passed in 2.7 minutes; that CPU flow passed, while the desktop CPU benchmark lost its execution context during navigation. All 24 new disk checks passed in both runs. |
+| `npm run test:e2e -- --last-failed --workers=1` | The single navigation-interrupted desktop CPU benchmark passed independently in 1.5 seconds with unchanged app source. Together with the final full run, all 112 cases at 1440×900, 1024×900, 768×900, and 390×844 are verified. Neither full run is misreported as a clean 112-pass command. |
+| `npm run build` | Final rebuild after phone-label sizing passed: 776 modules; main JS 422.88 kB (120.50 kB gzip), main CSS 39.18 kB (8.76 kB gzip), lazy disk comparison JS 3.89 kB (1.38 kB gzip), shared lazy chart JS 345.71 kB (98.84 kB gzip). Vite reported 389 ms for the final build; the command also ran TypeScript. |
+| `npm run preview -- --port 4173 --strictPort` | Final production preview running at http://127.0.0.1:4173/. The development server was stopped before changing server mode. |
+| `npm run test:e2e -- tests/browser/disk.spec.ts --workers=1` | Initial production pass: 20 checks in 27.9 seconds. After the phone-label readability fix and rebuild, final production pass: all 20 checks in 27.8 seconds, no retries, at all four widths. |
+| `npx prettier --write …`, `npm run format:check` | Application/tests/README formatting passed. Specification Markdown preserved. |
+| `git diff --check` | Passed; routine Windows LF/CRLF notices only. |
+| `git ls-files artifacts`, `git check-ignore artifacts/disk-wrap-desktop.png` | No tracked artifacts; the generated disk screenshot is ignored. |
+| `Invoke-WebRequest http://127.0.0.1:4173/` | Production preview returned HTTP 200. |
+| `Start-Process -FilePath 'C:/Program Files/Google/Chrome/Application/chrome.exe' -ArgumentList 'http://127.0.0.1:4173/#/disk' -WindowStyle Normal` | Approved Chrome launch succeeded to show the completed local application. |
+
+### Evidence and corrections
+
+- All four supplied disk fixtures match exact head paths, movement kinds/from/to/distances/IDs, service order, and totals. Independent tests cover lower-direction totals 236/386, FCFS's later head request, initial-head duplicates with non-lexical IDs, equidistant SSTF selection, one-sided sweeps, endpoint requests/duplicates, already-reached endpoint decisions, full wrap cost, stopping at the final service, empty/range/ID validation, nested immutability, same-input comparisons, and trace budgets.
+- Diverse bounded batches check every replay prefix: served IDs occur once, pending IDs are complementary, head and direction match the preceding move, positions stay in range, and cumulative/endpoint/wrap/average metrics equal the ledger's actual distances. No event has simulated time. Reducer tests verify source parsing, error paths, replay result reuse, speed/reset, source invalidation, comparison pause, and opening shared-input traces.
+- Browser flows verify reference replay coherence, pause/speed/replay invariance, exact comparison values and shared inputs, endpoint/wrap service-count preservation, lower sweeps, zero-distance duplicates, request reordering, inline invalid values, empty recovery, path windows, ledger keyboard selection, and navigation pause. Source fixtures are imported only by unit tests, never by application or benchmark code.
+- Inspected actual desktop wrap, tablet comparison/lower-SCAN, and narrow wrap captures. The central cylinder path and inspector agree with the selected move. Editor/ledger/chart scrolling stays inside labeled containers; browser checks assert no document-wide horizontal overflow. On narrow screens the cylinder chart can scroll horizontally to retain readable scale. Generated captures are local ignored artifacts.
+- Changed chart axis text to the specified graphite color; request-table minimum width and contained scrolling preserve usable editing at tablet widths. Long plot IDs shorten without losing their exact tooltip/table identity. No fixture expected value was changed.
+- Detailed phone chart captures at both scroll positions showed that the SVG's minimum 420 px width scaled its 480 px view box labels below 12 px. Raised SVG label sizes to retain at least 12 px after scaling and moved long-label anchoring earlier to preserve plot bounds. Rebuilt and reran all 20 production disk checks successfully. Full-page captures and the equivalent ledger remain available.
+- A final production phone capture measured painted label size 12.25 px, confirmed the chart scrolls internally, and confirmed no page-wide horizontal overflow. Both horizontal scroll positions were inspected after the fix.
+- Local performance: Windows, Chrome 156.0.8078.4, Intel Core i7-14700HX, 28 logical processors, one browser worker. Final full-run samples calculated the 8-request/10-event C-SCAN reference in about 0.2 ms. Comparing all four algorithms over 100 requests, max cylinder 100,000, head 50,000, and cylinders i×997 took 14.3–18.6 ms across four widths. Event counts were 100/100/101/102; totals were 148703/148703/150000/199850. Each result served all 100 IDs once and its ledger conserved movement. Subsequent editing and navigation remained responsive. These are local engine samples, not cross-device guarantees or exhaustive maximum-table rendering benchmarks; no Worker was justified.
+- Two verification setup issues are recorded honestly: the old preview was still serving despite a sandboxed process query returning no listener; elevated inspection identified its exact workspace Vite preview command before stopping it. During the first full regression, an availability-text edit caused a Vite reload inside an existing CPU test. The final source was frozen and the full regression rerun; no CPU algorithm/test expectation was modified.
+- The second full run had one navigation-interrupted CPU performance evaluation. Its isolated unchanged-source rerun passed, including the 48,024-event and oversized-workload checks. Full-run and retry counts are recorded separately above; no failed assertion was relabeled as a pass.
+
+### Limitations and scope
+
+- Static teaching batch without request arrivals, rotation/transfer costs, caching, measured I/O latency, or SSD modeling. Cylinder movement is distance; steps are decision sequence positions. Initial direction matters only to sweep algorithms.
+- Empty batches require at least one request under the specified product limits. An already-reached endpoint decision is explicitly visible with zero movement; it never consumes a request. Charts show processed history and bounded windows rather than unmarked future results.
+- Experiments remain in memory. Integrated CPU-memory-resource behavior, saved experiments, versioned localStorage, JSON transfer, and learning workflows are Phase 7. Release/deployment preparation is Phase 8. No backend, account, runtime AI service, database, or deployment was added.
+- Chrome at four widths is the browser target verified here; other engines, screen-reader sessions, and the full release accessibility audit remain unverified. Benchmarks import development source; production checks use the functional disk file only. Single-worker execution avoids the previously observed concurrent Chrome startup instability.
+- No later phase was started. Commit titles keep the user's details-only preference; required phase metadata remains in this status history and specification pack.
+- All requested Phase 6 completion gates are verified. The final production app is available at http://127.0.0.1:4173/#/disk and was opened in Chrome.
+
+### Next task
+
+Use `prompts/PHASE_07_INTEGRATION.md` when requested, with its required specifications and fixtures. Implement integrated behavior, saved experiments, comparison, and learning workflows. Phase 7 has not been started.

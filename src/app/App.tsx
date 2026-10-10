@@ -11,6 +11,8 @@ import { DeadlockLab } from '../features/deadlock/DeadlockLab';
 import { useDeadlock } from '../features/deadlock/DeadlockContext';
 import { SyncLab } from '../features/synchronization/SyncLab';
 import { useSync } from '../features/synchronization/SyncContext';
+import { DiskLab } from '../features/disk/DiskLab';
+import { useDisk } from '../features/disk/DiskContext';
 
 const routes = [
   { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', phase: 7 },
@@ -42,6 +44,7 @@ export function App() {
   const { dispatch: memoryDispatch } = useMemory();
   const { dispatch: deadlockDispatch } = useDeadlock();
   const { dispatch: syncDispatch } = useSync();
+  const { dispatch: diskDispatch } = useDisk();
   const current = routes.find((item) => item.id === route);
   useEffect(() => {
     const navigate = () => {
@@ -49,6 +52,7 @@ export function App() {
       setMenuOpen(false);
       deadlockDispatch({ type: 'pause-all' });
       syncDispatch({ type: 'replay', action: { type: 'pause' } });
+      diskDispatch({ type: 'replay', action: { type: 'pause' } });
       dispatch({ type: 'replay', action: { type: 'pause' } });
       cpuDispatch({ type: 'replay', action: { type: 'pause' } });
       memoryDispatch({
@@ -64,7 +68,14 @@ export function App() {
     };
     window.addEventListener('hashchange', navigate);
     return () => window.removeEventListener('hashchange', navigate);
-  }, [dispatch, cpuDispatch, memoryDispatch, deadlockDispatch, syncDispatch]);
+  }, [
+    dispatch,
+    cpuDispatch,
+    memoryDispatch,
+    deadlockDispatch,
+    syncDispatch,
+    diskDispatch,
+  ]);
   useEffect(() => {
     document.title = `${current?.label ?? (route === 'replay-preview' ? 'Replay preview' : 'Page unavailable')} · OS Lab Simulator`;
   }, [current, route]);
@@ -106,6 +117,7 @@ export function App() {
                 'paging',
                 'deadlock',
                 'synchronization',
+                'disk',
                 'help',
               ].includes(item.id) && (
                 <span
@@ -163,6 +175,8 @@ export function App() {
             <DeadlockLab />
           ) : route === 'synchronization' ? (
             <SyncLab />
+          ) : route === 'disk' ? (
+            <DiskLab />
           ) : route === 'replay-preview' ? (
             <PreviewLab />
           ) : route === 'help' ? (
@@ -210,9 +224,9 @@ function Unavailable({
             : 'Choose a lab from the navigation'}
         </h2>
         <p>
-          CPU scheduling, memory allocation, page replacement, and resource
-          safety are available with replay. Other algorithms and experiment
-          storage will be added in their specified phases.
+          CPU scheduling, memory allocation, page replacement, resource safety,
+          synchronization, and disk scheduling are available with replay.
+          Integrated experiments and storage are next.
         </p>
         <a className="button primary" href="#/cpu">
           Open CPU scheduling
@@ -275,7 +289,9 @@ function Dashboard() {
                         ? 'Available · graphs & Banker'
                         : item.id === 'synchronization'
                           ? 'Available · instruction interleavings'
-                          : `Unavailable · Phase ${item.phase}`}
+                          : item.id === 'disk'
+                            ? 'Available · four disk algorithms'
+                            : `Unavailable · Phase ${item.phase}`}
                 </span>
               </a>
             ))}
@@ -430,6 +446,19 @@ function Help() {
           flight; empty + full need not equal capacity between wait and signal.
           Buffer operations require mutex m ownership. This models interleavings
           rather than running real concurrent code.
+        </p>
+        <h2>Disk scheduling model</h2>
+        <p>
+          Disk requests form a static batch with unique IDs; duplicate cylinders
+          are separate services. FCFS preserves input order. SSTF selects the
+          closest cylinder, breaking ties by smaller cylinder then input order.
+          SCAN and C-SCAN serve requests at the initial head first and sweep in
+          the chosen direction. If opposite-side requests remain, they reach the
+          physical endpoint before reversing or wrapping. C-SCAN counts wrap
+          distance and performs no service during the wrap. Every algorithm
+          stops at its last request. An already-reached endpoint decision adds
+          zero distance. Charts use steps; metrics measure cylinders, not
+          latency.
         </p>
         <h2>Replay infrastructure example</h2>
         <p>

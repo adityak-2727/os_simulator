@@ -7,6 +7,7 @@ import { CpuProvider } from './features/cpu/CpuProvider';
 import { MemoryProvider } from './features/memory/MemoryProvider';
 import { DeadlockProvider } from './features/deadlock/DeadlockProvider';
 import { SyncProvider } from './features/synchronization/SyncProvider';
+import { DiskProvider } from './features/disk/DiskProvider';
 import './styles/index.css';
 
 const root = document.getElementById('root');
@@ -18,9 +19,11 @@ createRoot(root).render(
         <MemoryProvider>
           <DeadlockProvider>
             <SyncProvider>
-              <AppErrorBoundary>
-                <App />
-              </AppErrorBoundary>
+              <DiskProvider>
+                <AppErrorBoundary>
+                  <App />
+                </AppErrorBoundary>
+              </DiskProvider>
             </SyncProvider>
           </DeadlockProvider>
         </MemoryProvider>
