@@ -567,3 +567,11 @@ The first full development attempt was stopped after a new live announcement dup
 - No public deployment, hosted-origin verification or publication occurred. The GitHub Pages workflow is an inactive example. Origin-specific storage transfers through JSON; there is no cloud synchronization or complete offline-reload guarantee.
 - Simulation remains a finite browser teaching model: one CPU, zero switch cost, static disk batch, typed instruction interleavings and bounded integration. No native execution, backend, authentication, AI service, database or new algorithm scope was added.
 - Next work only when requested: deployment with hosted-origin checks, user/screen-reader evaluation, or a separately scoped extension. Commit titles use descriptive details without phase labels.
+
+### Git and local application handover
+
+- Staged the 29 release source, test, configuration, dependency-notice and handover files explicitly. `git diff --cached --check` passed. `git ls-files docs prompts artifacts` returned no tracked files; algorithm engines and fixtures were unchanged.
+- `git commit -m "Prepare verified release and project handover"` succeeded as **c9ea5b3**. `git push origin main` succeeded to https://github.com/adityak-2727/os_simulator.git, advancing **7a2e331 → c9ea5b3**. The title contains details only, without a phase label.
+- After that push, `git status --short` was clean and `git rev-list --left-right --count HEAD...origin/main` returned **0 0**. This evidence is recorded in a subsequent documentation-only handover commit.
+- `npm run preview -- --port 4173 --strictPort` remains running. Opened the actual application in Chrome at **http://127.0.0.1:4173/#/cpu** with Start-Process; HTTP verification returned **200**. Root-path production assets match the fully checked build.
+- Final handover formatting and `npm run licenses:check` passed. No source edits followed production verification. All eight phases are complete; no deployment or next phase was started.
