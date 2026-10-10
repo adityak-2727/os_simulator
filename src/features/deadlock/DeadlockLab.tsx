@@ -306,6 +306,7 @@ export function DeadlockLab() {
           </div>
         </section>
         <MemoryInspector
+          playing={replay.playing}
           title={
             event
               ? event.kind === 'banker-select'

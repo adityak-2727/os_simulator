@@ -166,6 +166,7 @@ export function SyncLab() {
           </div>
         </section>
         <MemoryInspector
+          playing={replay.playing}
           title={
             event
               ? `${event.processId}: ${event.instruction && event.kind !== 'selection-rejected' ? instructionText(event.instruction) : 'choice rejected'}`

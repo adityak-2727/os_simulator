@@ -1,7 +1,7 @@
 {
   "name": "os-lab-simulator",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "engines": {
     "node": ">=24.13.0 <25"
@@ -12,11 +12,16 @@
     "preview": "vite preview --host 127.0.0.1",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "format": "prettier --write src tests *.ts *.json *.html *.js README.md",
-    "format:check": "prettier --check src tests *.ts *.json *.html *.js README.md",
+    "format": "prettier --write src tests scripts *.ts *.json *.html *.js README.md RELEASE_HANDOVER.md .github/workflows/*.yml",
+    "format:check": "prettier --check src tests scripts *.ts *.json *.html *.js README.md RELEASE_HANDOVER.md .github/workflows/*.yml",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:production": "node scripts/browser-checks.mjs production",
+    "test:pages": "node scripts/browser-checks.mjs pages",
+    "build:pages": "node scripts/build-pages.mjs",
+    "licenses": "node scripts/licenses.mjs",
+    "licenses:check": "node scripts/licenses.mjs --check"
   },
   "dependencies": {
     "@xyflow/react": "^12.12.0",
@@ -25,6 +30,7 @@
     "recharts": "^3.10.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.64.0",
     "@tailwindcss/vite": "^4.3.3",

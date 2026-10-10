@@ -59,22 +59,27 @@ Use **Save experiment**, **Export JSON**, or **Export results CSV** from any rea
 
 Experiment JSON uses `format: os-lab-simulator`, schema version 1, save metadata, the module's engine semantic version and its source scenario. Expected-result fixture packs are not importable experiments. JSON imports are limited to 1 MiB, local collections to 30 experiments, integrated input to 20 processes/8 resources/100 instructions per process, and traces to 50,000 events. Storage uses `os-lab-simulator.experiments.v1` and a separate `os-lab-simulator.preferences.v1` key. Quota, security and corrupt-storage failures preserve active work and offer JSON export. A collection that cannot be validated is not overwritten. Existing saves can be exported from the list; an unavailable browser storage policy must be resolved in browser settings before saving.
 
-Source specifications in `docs/`, phase prompts in `prompts/`, and generated `artifacts/` are intentionally local and ignored by Git at the user's request. Numerical fixtures remain tracked as test oracles. Phase 8 release preparation is the next task; no deployment has been performed.
+Source specifications in `docs/`, phase prompts in `prompts/`, and generated `artifacts/` are intentionally local and ignored by Git at the user's request. Numerical fixtures remain tracked as test oracles. See [RELEASE_HANDOVER.md](RELEASE_HANDOVER.md) for the requirements-to-tests map, architecture explanation, five-minute demo and remaining limits. No deployment has been performed.
 
-| Command                | Purpose                                                                 |
-| ---------------------- | ----------------------------------------------------------------------- |
-| `npm run dev`          | Start local Vite development server                                     |
-| `npm run typecheck`    | Strict TypeScript checking of source, configurations, and tests         |
-| `npm run lint`         | ESLint TypeScript and React rules                                       |
-| `npm run format`       | Format application files and README, preserving specification documents |
-| `npm run format:check` | Check application formatting                                            |
-| `npm test`             | Vitest watch mode                                                       |
-| `npm run test:run`     | One-shot unit and replay tests                                          |
-| `npm run test:e2e`     | Playwright checks at 1440, 1024, 768, and 390 px                        |
-| `npm run build`        | Typecheck and production build into `dist/`                             |
-| `npm run preview`      | Locally serve the production build                                      |
+| Command                   | Purpose                                                                 |
+| ------------------------- | ----------------------------------------------------------------------- |
+| `npm run dev`             | Start local Vite development server                                     |
+| `npm run typecheck`       | Strict TypeScript checking of source, configurations, and tests         |
+| `npm run lint`            | ESLint TypeScript and React rules                                       |
+| `npm run format`          | Format application files and README, preserving specification documents |
+| `npm run format:check`    | Check application formatting                                            |
+| `npm test`                | Vitest watch mode                                                       |
+| `npm run test:run`        | One-shot unit and replay tests                                          |
+| `npm run test:e2e`        | Playwright checks at 1440, 1024, 768, and 390 px                        |
+| `npm run test:production` | Functional and accessibility checks against the built production app    |
+| `npm run build:pages`     | Build assets for the exact `/os_simulator/` repository path             |
+| `npm run test:pages`      | Verify repository-path assets, hash refresh and experiment transfer     |
+| `npm run licenses`        | Regenerate locked dependency inventory and runtime notices              |
+| `npm run licenses:check`  | Check inventory and license notices against the lockfile                |
+| `npm run build`           | Typecheck and production build into `dist/`                             |
+| `npm run preview`         | Locally serve the production build                                      |
 
-Playwright starts its own server at port 4173 and uses installed Google Chrome (`channel: 'chrome'`). Install Chrome first if unavailable; alternatively configure Playwright's bundled Chromium and install it with `npx playwright install chromium`. Generated screenshots in `artifacts/`, failure traces in `test-results/`, and reports in `playwright-report/` are ignored by Git. Existing local screenshots are preserved. Port 4173 must be available or already serving this app. The performance checks import source engines from the development server; run functional checks alone against a production preview, for example `npm run test:e2e -- tests/browser/synchronization.spec.ts --workers=1`. A single worker can avoid concurrent Chrome startup failures on this machine.
+Playwright starts its own server at port 4173. Local checks use installed Google Chrome; CI uses bundled Chromium installed with `npx playwright install --with-deps chromium`. To use Chromium locally, set `PLAYWRIGHT_CHANNEL=chromium` and run `npx playwright install chromium`. Generated screenshots in `artifacts/`, failure traces in `test-results/`, and reports in `playwright-report/` are ignored by Git. Existing local screenshots are preserved. Stop other servers on port 4173 before production/path checks. Performance checks import pure source engines from the development server and are excluded from the production runner. Use `npm run test:production -- --workers=1` after building; a single worker avoids concurrent Chrome startup contention on this machine. The hosting smoke test runs only with `npm run test:pages` after `npm run build:pages`.
 
 ## Architecture
 
@@ -90,6 +95,8 @@ Playwright starts its own server at port 4173 and uses installed Google Chrome (
 - `src/features/deadlock/`: independent graph/Banker drafts, Context/reducer playback, keyboard editors, lazy React Flow canvas, actual/tentative matrices, Work/Finish traces, and actual-event explanations.
 - `src/features/synchronization/`: typed program editor, scripted/manual selection, explicit branch review, Context/reducer playback, code PCs, local/shared data, ownership/wait tables, FIFO slots, and actual-event learning content.
 - `src/features/disk/`: request editor, Context/reducer playback, cylinder-scaled windowed SVG path, equivalent movement ledger, pending/service rows, actual decision explanations, and lazy Recharts comparison.
+- `src/engine/system/` and `src/features/system/`: pure integrated scheduling and one-frame CPU/memory/resource/queue/waiting views.
+- `src/experiments/`: strict versioned envelope validation, storage failure recovery, source loading and exports.
 - `src/components/`: accessible primitives and native SVG timeline with an equivalent table.
 - `src/styles/`: specification tokens and responsive workbench.
 - `tests/unit/` and `tests/browser/`: deterministic transitions, invariants, replay immutability, validation, keyboard, routes, and layout evidence.
@@ -102,9 +109,30 @@ Memory uses integer KiB and half-open ranges `[start, end)`, with capacity 1–6
 
 Paging supports 1–12 frames, 1–200 references, and page IDs 0–9,999. Empty frames fill from index 0 upward. FIFO hits preserve insertion order; LRU hits update recency; Optimal knows future references and breaks ties by frame index. Counts and ratios use only processed references; ratios are unavailable at step 0. Memory and paging use steps, without a simulated millisecond cost. Navigating away pauses playback and preserves each lab's independent inputs.
 
-## Build boundaries
+## Supported limits
 
-Foundation and all six standalone labs, integrated CPU-memory-resource replay, saved experiments, comparison and learning workflows are implemented. The next task is `prompts/PHASE_08_RELEASE.md`: release correctness, usability, accessibility, documentation and demo preparation. No deployment has been performed.
+| Model                       | Bound                                                                                                                            |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| IDs / experiment names      | IDs: 1–24 letters, digits, underscore or hyphen; names: 1–80 trimmed characters                                                  |
+| CPU                         | 1–50 processes; arrivals 0–10,000 t; burst/quantum 1–1,000 t; priority 0–999                                                     |
+| Allocation                  | Capacity 1–65,536 KiB; 1–200 ordered operations                                                                                  |
+| Paging                      | 1–12 frames; 1–200 references; pages 0–9,999                                                                                     |
+| Resource graph              | 1–12 processes and 1–12 single-instance resources                                                                                |
+| Banker                      | 1–10 processes; 1–8 resources; instance values 0–1,000; Allocation ≤ Max and column allocation ≤ Total                           |
+| Synchronization             | 2–4 processes; 1–100 instructions each; buffer 1–10 items; at most 1,000 choices                                                 |
+| Disk                        | 1–100 requests; maximum cylinder 1–100,000; head and requests within 0..maximum                                                  |
+| Integrated                  | 1–20 processes; up to 8 resources; 1–100 instructions each; positive CPU work required; CPU/allocation arrival and memory bounds |
+| Transfer / storage / replay | JSON ≤1 MiB; 30 saved experiments; 50,000 events per trace                                                                       |
+
+Malformed fields remain editable. Valid model operations can still fail, block or produce unsafe/stalled states with explanations. Unsafe Banker requests retain source matrices. Saving a computed Banker analysis preserves whether it was safety-only or a request; when no analysis exists, export uses the configured request fields.
+
+## Static hosting and release scope
+
+`npm run build` creates a root-path static bundle. `npm run build:pages` uses `/os_simulator/` for the supplied repository. Verify it locally with `npm run test:pages -- --workers=1`. Hash navigation supports direct lab refresh without host rewrites. The prepared candidate GitHub Pages address is `https://adityak-2727.github.io/os_simulator/`; this does not claim the site is live. The inactive template `deployment/github-pages.yml.example` must be enabled only when publication is requested. `.github/workflows/quality.yml` runs checks only with read-only permissions. Hosted-origin asset/refresh/storage/import checks remain pending until a deployment is requested. Origin-specific saves transfer using JSON.
+
+The action and path configuration follows the official [checkout](https://github.com/actions/checkout), [setup-node](https://github.com/actions/setup-node), [Vite static deployment](https://vite.dev/guide/static-deploy.html), and [Playwright CI](https://playwright.dev/docs/ci) documentation. Locked dependency versions and licenses are in [DEPENDENCIES.md](DEPENDENCIES.md). Runtime notices ship as `THIRD_PARTY_NOTICES.txt` in `dist/`; `npm run licenses:check` prevents stale notices.
+
+Foundation, all six standalone labs, integrated CPU-memory-resource replay, saved experiments, comparison and learning workflows are implemented. This is v1.0.0 release preparation. Engines are synchronous teaching models, not kernel monitoring or native execution. There is no full offline reload guarantee or cross-device storage. Browser/axe coverage does not replace screen-reader and user evaluation. No deployment has been performed. No later implementation phase is required after the recorded release gate.
 
 The Markdown specification pack is the implementation contract. See `BUILD_STATUS.md` for commands actually run, verification evidence, limitations, and the next task.
 

@@ -93,7 +93,12 @@ export function useScenarioBridge(route: string) {
         parsed =
           mode === 'graph'
             ? parseGraph(deadlock.state.graph.draft)
-            : parseBanker(deadlock.state.banker.draft, true);
+            : parseBanker(
+                deadlock.state.banker.draft,
+                deadlock.state.banker.result
+                  ? Boolean(deadlock.state.banker.result.scenario.request)
+                  : true,
+              );
         name =
           mode === 'graph'
             ? 'Single-instance resource graph'

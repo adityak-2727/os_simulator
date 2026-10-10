@@ -103,7 +103,7 @@ export function CpuTimeline({
         <svg
           width={width}
           height={130}
-          role="img"
+          role="group"
           aria-labelledby="cpu-timeline-title cpu-timeline-description"
         >
           <title id="cpu-timeline-title">

@@ -278,6 +278,7 @@ export function SystemLab() {
           </div>
         </section>
         <MemoryInspector
+          playing={replay.playing}
           title={
             frame?.event
               ? `${frame.event.kind} · t=${frame.event.simTime}`

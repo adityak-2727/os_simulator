@@ -1,6 +1,6 @@
 # Build status
 
-Phases 1–7 are complete. The specification pack is preserved locally; docs/, prompts/ and artifacts/ are ignored at the user's request. Phase 8 has not been started.
+Phases 1–8 are complete. The v1.0.0 release gate passed locally. The specification pack is preserved locally; docs/, prompts/ and artifacts/ are ignored at the user's request. No public deployment has been performed.
 
 | Phase | Status | Evidence |
 | --- | --- | --- |
@@ -11,11 +11,11 @@ Phases 1–7 are complete. The specification pack is preserved locally; docs/, p
 | 5 Synchronization | Complete | Three synchronization fixtures and intermediate PCs, 148 total unit tests, 88 regression/benchmark browser checks, 16 production synchronization checks at four widths, clean typecheck/lint/build/format, inspected desktop/tablet/narrow screenshots |
 | 6 Disk scheduling | Complete | Four exact disk fixtures; 177 total unit tests; 112 browser cases verified (111 final full-run passes plus one navigation-interrupted benchmark passing independently); 20 final production disk checks; clean typecheck/lint/build/format; inspected desktop/tablet/narrow layouts |
 | 7 Integration | Complete | Exact integrated fixture; 198 unit tests; 148 full regression browser checks; 32 production checks; validated round trips and storage failure recovery; clean typecheck/lint/build/format; desktop/tablet/narrow review |
-| 8 Release | Not started | No application code yet |
+| 8 Release | Complete | Clean npm ci; 198 unit tests; 160 development browser checks; 136 production checks; 4 repository-path checks; clean typecheck/lint/build/format/notices; four-width visual and accessibility review; CI/static-host files and release handover |
 
 ## Current task
 
-Integrated system and saved experiments handover complete. Next task when requested: Phase 8 using `prompts/PHASE_08_RELEASE.md`. No later phase was started.
+All eight requested phases are complete. Read `RELEASE_HANDOVER.md` for the requirements-to-tests map, five-minute demo, hosting instructions and limitations. There is no next phase prompt. Future changes or public deployment require a new request; no deployment has been performed.
 
 ## Update format
 
@@ -507,3 +507,63 @@ Use `prompts/PHASE_07_INTEGRATION.md` when requested, with its required specific
 - `git commit -m "Implement integrated scheduling and saved experiment workflows"` succeeded as `ac5ed3f`, 29 files. The title contains details only, without a phase label.
 - `git push origin main` succeeded to the requested GitHub repository, advancing `2243e5f` to `ac5ed3f`. `git status --short` was clean and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`.
 - This Git evidence is recorded in a subsequent handover-only commit. Production preview remains running at http://127.0.0.1:4173/#/system and was opened in Chrome. Phase 8 is not started; no deployment was performed.
+
+## 2026-10-10 — Phase 8 release verification and handover
+
+### What works and changed files
+
+- Completed the v1 requirements audit without changing algorithm engines, fixtures, numerical conventions or saved schema v1. Application version is now 1.0.0; module engine versions remain unchanged because calculations are unchanged.
+- Fixed a reproducibility defect in `src/experiments/bridge.ts`: exporting a computed Banker safety-only analysis no longer adds an unsubmitted request. Request analyses still export their actual configured request. The browser regression exports, imports, recomputes and checks the unchanged Available vector, and also verifies request export and unsafe rollback accessibility.
+- Fixed interactive CPU timeline semantics in `src/features/cpu/CpuTimeline.tsx`: the SVG is a labeled group containing accessible interval buttons, rather than an image hiding nested controls.
+- `MemoryShared.tsx`, `DeadlockLab.tsx`, `SyncLab.tsx` and `SystemLab.tsx` announce selected manual replay steps/event titles and suppress autoplay announcements. Full explanations remain visible in the inspector. `AppErrorBoundary.tsx` correctly calls preserved inputs workloads rather than fixtures.
+- `ResourceGraph.tsx` and `src/styles/index.css` improve attribution contrast, graph legend/edge text and resource instance labels. The graph retains its attribution and numeric/table alternatives. `index.html` and `public/favicon.svg` remove the missing favicon request using the active build base.
+- `tests/browser/release.spec.ts` audits all ten v1 routes and seven final lab states at four widths, checks invalid and empty states, reduced motion, keyboard stepping and Banker safety/request exports. Existing browser cases cover running, paused, blocked, unsafe/waiting, deadlocked, stalled, input invalidation and storage recovery.
+- `playwright.config.ts` and `scripts/browser-checks.mjs` separate development benchmarks from production functional checks, use installed Chrome locally and bundled Chromium in CI, and require fresh production/path servers. `scripts/build-pages.mjs` and `vite.config.ts` support the exact `/os_simulator/` path. `hosting.spec.ts` verifies asset loading, hash refresh, lazy graph assets, saved experiment persistence and JSON export/import at that prefix.
+- `.github/workflows/quality.yml` prepares clean-install, checks, development browser, production browser and path verification on Linux with read-only repository permissions. `deployment/github-pages.yml.example` is an inactive manual publication template; no deployment job is active.
+- `scripts/licenses.mjs`, `DEPENDENCIES.md`, `public/THIRD_PARTY_NOTICES.txt` and `deployment/victory-LICENSE.txt` record all 293 lockfile dependency entries and preserve runtime/vendored license texts. Notice checking normalizes line endings and path separators for Windows/Linux compatibility. The upstream Victory MIT notice supplements its packaged vendored D3 notices.
+- `README.md` documents commands, exact bounds, assumptions, source export semantics and hosting. `RELEASE_HANDOVER.md` provides architecture, FR01–FR13 test mapping, actual results, limitations and the five-minute demo. docs/, prompts/, artifacts/, dist/ and browser reports remain intentionally ignored and locally preserved.
+
+### Commands actually executed and results
+
+Environment: Windows, Node **24.13.0**, npm **11.6.2**, installed Chrome **156.0.8078.4**, Intel i7-14700HX, 28 logical processors.
+
+| Command | Observed result |
+| --- | --- |
+| `node --version`, `npm --version` | v24.13.0 and 11.6.2 |
+| `npm install --save-dev @axe-core/playwright` | Initial sandbox cache-only attempt returned ENOTCACHED; approved retry added two free development packages, audit reported zero vulnerabilities |
+| `npm ci` | Clean lockfile install succeeded: 247 packages added, 248 audited, zero reported vulnerabilities |
+| `npm run typecheck` | Passed; also passed within both production/path builds and final restored build |
+| `npm run lint` | Passed, including final graph text changes and new Node scripts |
+| `npm run format`, targeted `npx prettier --write`, `npm run format:check` | Formatting and final checks passed |
+| `npm run licenses`, `npm run licenses:check` | Generated and verified dependency inventory/runtime notices; initial root-only search detected Victory's nested notices, which are now included with upstream MIT text |
+| `npm run test:run` | **198 tests passed, 14 files**, 3.31 s in the clean-install run; fixtures/invariants unchanged |
+| `npm run test:e2e -- tests/browser/release.spec.ts --project=desktop --workers=1` | Incremental audits found real contrast/SVG/favicon defects plus test selector/paused-clock issues; fixed before the final suites |
+| `npm run test:e2e -- --workers=1` | Final complete run: **160 passed**, **4 intentionally skipped** path-only cases, **6.5 minutes**, no retries; log `artifacts/release-development.log` |
+| `npm run build` | Passed, **788 modules**, main JS **476.12 kB / 134.97 kB gzip**, application CSS **40.35 kB / 9.04 kB gzip**, lazy graph/comparison chunks; no chunk-size warning; runtime notices and favicon in dist |
+| `npm run test:production -- --workers=1` | Final build: **136 passed**, **4 intentionally skipped** path-only cases, **3.7 minutes**, no retries; log `artifacts/release-production.log` |
+| `npm run build:pages` | Passed; inspected HTML points assets/favicon to `/os_simulator/`; log `artifacts/release-pages-build.log` |
+| `npm run test:pages -- --workers=1` | **4 passed**, **10.2 s**, all widths, no retries; log `artifacts/release-pages.log` |
+| `npm run build` after path checks | Restored root-path build, identical production JS/CSS hashes; typecheck passed |
+| `git diff --check`, `git check-ignore ...` | Whitespace check passed; docs/, prompts/, artifacts/ confirmed ignored |
+| `npm run preview -- --port 4173 --strictPort` | Production app running at http://127.0.0.1:4173/ for local review |
+
+Browser runners were piped through PowerShell Tee-Object to retain actual output; their exit codes were preserved. Node NO_COLOR/FORCE_COLOR warnings were runner output, not app console errors. A sandbox browser attempt returned spawn EPERM; approved execution ran successfully. No required local gate remains blocked.
+
+The first full development attempt was stopped after a new live announcement duplicated a Banker explanation in a text locator. Announcement text was narrowed to the selected step/title; the final full development run passed. Its initial partial log is retained as `artifacts/release-development-initial.log`, not counted as a passing full run. The final font-size-only graph fixes followed that development run and were included in the complete production suite and visual review. No application source changed after the production suite began.
+
+### Visual, accessibility and performance evidence
+
+- Inspected actual 1440, 1024, 768 and 390 px screenshots: CPU replay/comparison, graph deadlock, disk path, synchronization, integrated completion/blocking, invalid CPU input and empty experiments. Inputs, scaled visuals, tables and inspectors retain the workbench design. Narrow tables/timelines scroll within labeled regions; the page stays contained. Keyboard tests verify visible focus, skip link, editing, step/rewind, matrix/graph operations and equivalent ledgers. Reduced-motion CSS disables transitions/animation while preserving stepping.
+- Release tests run **80 selected WCAG A/AA axe audits per complete suite**, covering initial routes, final lab views, invalid CPU inputs and Banker safety/rollback. Final suites report no violations in the configured rules and no application console/page errors during the all-route audits. This is not formal certification or a substitute for screen-reader/user evaluation.
+- Evidence: `artifacts/release-{cpu,allocation,paging,deadlock,synchronization,disk,system}-{desktop,tablet,compact,narrow}.png`, `release-reduced-motion-*.png`, `release-empty-*.png`, plus existing `cpu-invalid-narrow.png`, `system-blocked-desktop.png`, `banker-rollback-*.png` and comparison screenshots. Successful initial-route axe reports are attached under test-results/. All evidence remains ignored locally.
+- Saved **24 measured engine runs** in `artifacts/release-measurements.json`, derived from actual final browser console logs. Small CPU reference: 15 events, **0.1–0.2 ms**. Near-budget CPU: 24 processes, quantum 1, 48,024 events, **57.7–74.1 ms**; oversized work rejected with a typed limit error.
+- Allocation: 200 operations **3.6–4.5 ms**; Optimal: 200 references/12 frames **0.8–1.0 ms**. Maximum Banker: 13 events **0.2–0.3 ms**; 12-process/resource graph: 49 events **0.4–0.8 ms**. Synchronization: 1,000 scheduled choices **4.8–5.7 ms**. Comparing four 100-request disk runs: **7.6–16.5 ms**. Small cases were 0.0–0.2 ms at browser clock resolution; reported zero readings mean below that resolution, not cost-free execution.
+- Integrated small workload: 34 events **0.2–0.3 ms**. Supported maximum program count (20 × 100 instructions, CPU duration 1, quantum 1,000): 4,101 events, 20 completions, **29.8–34.7 ms**. Excessive CPU/quantum work was rejected before execution in **0.2–0.3 ms**. These are machine-specific observations; engines remain synchronous, with explicit size/event bounds and possible brief pauses for dense traces.
+
+### Remaining limitations and next task
+
+- All eight implementation phases and required local gates are complete. No next phase prompt remains. `RELEASE_HANDOVER.md` and README reproduce review/install/demo workflows without ignored documentation.
+- CI files are prepared; a remote GitHub Actions result has not been observed in this release gate. Linux/bundled Chromium, Firefox/Safari, physical-device and full screen-reader sessions are not claimed locally verified. Windows Chrome is verified at the four specified widths.
+- No public deployment, hosted-origin verification or publication occurred. The GitHub Pages workflow is an inactive example. Origin-specific storage transfers through JSON; there is no cloud synchronization or complete offline-reload guarantee.
+- Simulation remains a finite browser teaching model: one CPU, zero switch cost, static disk batch, typed instruction interleavings and bounded integration. No native execution, backend, authentication, AI service, database or new algorithm scope was added.
+- Next work only when requested: deployment with hosted-origin checks, user/screen-reader evaluation, or a separately scoped extension. Commit titles use descriptive details without phase labels.

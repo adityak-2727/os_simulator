@@ -331,6 +331,9 @@
 .resource-graph .react-flow__node {
   font-family: ui-monospace, Consolas, monospace;
 }
+.resource-graph .react-flow__node small {
+  font-size: 12px;
+}
 .resource-graph .react-flow__controls button {
   color: #17212f;
 }
@@ -339,7 +342,7 @@
   flex-wrap: wrap;
   gap: 6px 14px;
   color: #526071;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.7;
 }
 .deadlock-workbench .rule-box {
@@ -1658,6 +1661,11 @@ dd {
     transition: none !important;
     animation: none !important;
   }
+}
+
+/* Preserve React Flow attribution with readable small-text contrast. */
+.resource-graph .react-flow__attribution a {
+  color: #526071;
 }
 
 /* CPU lab: extend the foundation workbench without changing other routes. */

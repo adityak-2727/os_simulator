@@ -98,6 +98,7 @@ export function MemoryInspector({
   events,
   cursor,
   select,
+  playing,
 }: {
   title: string;
   reason: string;
@@ -105,12 +106,18 @@ export function MemoryInspector({
   events: readonly { title: string; step: number }[];
   cursor: number;
   select: (cursor: number) => void;
+  playing?: boolean;
 }) {
   const start = Math.max(0, cursor - 4),
     visible = events.slice(start, start + 7);
   return (
     <Panel title="Event inspector" className="inspector-panel">
       <div className="panel-body">
+        {playing !== undefined && (
+          <div className="sr-only" aria-live={playing ? 'off' : 'polite'}>
+            Selected replay step {cursor}. {title}.
+          </div>
+        )}
         <div className="eyebrow">STEP {cursor}</div>
         <h2 className="event-title">{title}</h2>
         <p className="event-copy">{reason}</p>

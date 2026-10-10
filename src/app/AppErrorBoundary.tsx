@@ -27,7 +27,7 @@ export class AppErrorBoundary extends Component<
           <h1>The workspace could not render</h1>
           <p>{this.state.error}</p>
           <p>
-            Your fixture inputs remain in the active lab state. Try reopening
+            Your workload inputs remain in the active lab state. Try reopening
             the workspace.
           </p>
           <Button primary onClick={() => this.setState({ error: null })}>

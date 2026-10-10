@@ -79,7 +79,7 @@ export function ResourceGraph({
         strokeWidth: cyclic ? 2.5 : 1.6,
         ...(e.kind === 'request' ? { strokeDasharray: '5 4' } : {}),
       },
-      labelStyle: { fill: color, fontSize: 11 },
+      labelStyle: { fill: color, fontSize: 12 },
       ariaLabel: `${e.kind}: ${e.source.id} to ${e.target.id}`,
     };
   });
