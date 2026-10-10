@@ -428,3 +428,10 @@ Use `prompts/PHASE_06_DISK.md` when requested, with its required specifications 
 ### Next task
 
 Use `prompts/PHASE_07_INTEGRATION.md` when requested, with its required specifications and fixtures. Implement integrated behavior, saved experiments, comparison, and learning workflows. Phase 7 has not been started.
+
+### Git handover
+
+- Approved `git add …` staged only the listed disk implementation, checks, and documentation. `git diff --cached --check` passed. Generated artifacts remain ignored; no screenshot or unrelated file was staged or deleted.
+- `git commit -m "Implement disk scheduling and cylinder movement replay"` succeeded: `62b9f5c`, 21 files changed. The commit title contains details only, without a phase label.
+- Approved `git push origin main` succeeded to the requested `adityak-2727/os_simulator` repository, advancing `6d7a59a` to `62b9f5c`. Afterward, `git status --short` was clean and `git rev-list --left-right --count HEAD...origin/main` returned `0 0`.
+- This Git evidence is recorded in a subsequent documentation-only commit. The final production preview remains available at http://127.0.0.1:4173/#/disk and was opened in Chrome. No deployment was performed.
