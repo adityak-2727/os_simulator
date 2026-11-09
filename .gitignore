@@ -8,3 +8,9 @@ prompts/
 *.local
 .env*
 !.env.example
+**/00_START_HERE.md
+**/AGENTS.md
+**/BUILD_STATUS.md
+**/DEPENDENCIES.md
+**/MASTER_PROMPT.md
+**/RELEASE_HANDOVER.md
